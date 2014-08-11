@@ -191,6 +191,10 @@ Returns a list of all the images for this project in the registry.
 $ bundle exec armada -p zuulboy -e bld -a list
 ````
 
+### Release process
+* rake spec 
+* rake release
+
 Future Additions
 ----------------
 
