@@ -10,13 +10,6 @@ task :deploy do
   invoke 'deploy:cleanup'
 end
 
-task :deploy_console do
-  invoke 'deploy:get_image'
-  invoke 'deploy:stop'
-  invoke 'deploy:launch_console'
-  invoke 'deploy:cleanup'
-end
-
 task :rolling_deploy do
   invoke 'deploy:get_image'
   invoke 'deploy:rolling_deploy'
@@ -47,18 +40,6 @@ namespace :deploy do
   task :start_new do
     on_each_docker_host do |server|
       start_new_container(
-        server,
-        fetch(:image_id),
-        fetch(:port_bindings),
-        fetch(:binds),
-        fetch(:env_vars)
-      )
-    end
-  end
-
-  task :launch_console do
-    on_each_docker_host do |server|
-      launch_console(
         server,
         fetch(:image_id),
         fetch(:port_bindings),
@@ -135,34 +116,5 @@ namespace :deploy do
         debug "\t#{key} => #{value.inspect}"
       end
     end
-  end
-
-  task :promote_from_staging do
-    if fetch(:environment) == 'staging'
-      error "\n\nYour target environment needs to not be 'staging' to promote from staging."
-      exit(1)
-    end
-
-    starting_environment = current_environment
-
-    # Set our env to staging so we can grab the current tag.
-    invoke 'environment:staging'
-
-    staging_tags = get_current_tags_for(fetch(:image)).map { |t| t[:tags] }.flatten.uniq
-
-    if staging_tags.size != 1
-      error "\n\nUh, oh: Not sure which staging tag to deploy! Found:(#{staging_tags.join(', ')})"
-      exit(1)
-    end
-
-    info "Staging environment has #{staging_tags.first} deployed."
-
-    # Make sure that we set our env back to production, then update the tag.
-    set_current_environment(starting_environment)
-    set :tag, staging_tags.first
-
-    info "Deploying #{fetch(:tag)} to the #{starting_environment} environment"
-
-    invoke 'deploy'
   end
 end

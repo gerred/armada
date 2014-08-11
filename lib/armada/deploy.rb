@@ -116,17 +116,6 @@ module Armada::Deploy
     start_container_with_config(host, volumes, port_bindings, container_config)
   end
 
-  def launch_console(host, image_id, port_bindings, volumes, env_vars=nil)
-    container_config = container_config_for(host, image_id, port_bindings, env_vars, volumes).merge(
-      'Cmd'          => ['/bin/bash'],
-      'AttachStdin'  => true,
-      'Tty'          => true,
-      'OpenStdin'    => true)
-
-    container = start_container_with_config(host, volumes, port_bindings, container_config)
-    # container.attach({:stream => true, :stdin => true, :stdout => true, :stderr => true, :tty => true})
-  end
-
   private
   
   def start_container_with_config(host, volumes, port_bindings, container_config)

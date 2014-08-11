@@ -6,39 +6,8 @@ them on a fleet of hosts with the correct environment variables, host volume
 mappings, and port mappings. Supports rolling deployments out of the box, and
 makes it easy to ship applications to Docker servers.
 
-We're using it to run our production infrastructure.
-
-armada works in a two part deployment process where the build process ships
-a container to the registry, and armada ships containers from the registry
-to the Docker fleet. Registry support is handled by the Docker command line
-tools directly so you can use anything they currently support via the normal
-registry mechanism.
-
-If you haven't been using a registry, you should read up on how to do that
-before trying to deploy anything with armada.  Docker, Inc [provide
-repositories](https://index.docker.io/), including the main public repository.
-Alternatively, you can [host your
-own](https://github.com/dotcloud/docker-registry), or
-[Quay.io](https://quay.io) is another commercial option.
-
-Status
-------
-
-This project is under active development! The initial release on GitHub contains
-one roll-up commit of all our internal code. But all internal development will
-now be on public GitHub. See the CONTRIBUTORS file for the contributors to the
-original internal project.
-
 Installation
 ------------
-
-armada is a Ruby gem. It assumes that you have a working, modern-ish Ruby
-(1.9.3 or higher). On Ubuntu 12.04 you can install this with the `ruby-1.9.1`
-system package, for example. On OSX this is best accomplished via `rbenv` and
-`ruby-build` which can be installed with [Homebrew](http://brew.sh/) or from
-[GitHub](https://github.com/sstephenson/rbenv).
-
-Once you have a running, modern Ruby, you simply:
 
 ```
 $ gem install armada
@@ -51,7 +20,7 @@ the commands should just work now.
 Configuration
 -------------
 
-armada expects to find configuration tasks in the current working directory.
+Armada expects to find configuration tasks in the current working directory.
 Soon it will also support reading configuration from etcd.
 
 We recommend putting all your configuration for multiple applications into a
@@ -65,17 +34,17 @@ It will look for configuration files in either `./config/armada` or `.`.
 
 The pattern at New Relic is to have a configs repo with a `Gemfile` that
 sources the armada gem. If you want armada to set up the structure for
-you and to create a sample config, you can simply run `armadaize` once you
+you and to create a sample config, you can simply run `armadize` once you
 have the Ruby Gem installed.
 
 armada ships with a simple scaffolding tool that will setup a new config repo for
 you, as well as scaffold individual project configs. Here's how you run it:
 
 ```bash
-$ armadaize -p <your_project>
+$ armadize -p <your_project>
 ```
 
-`armadaize` relies on Bundler being installed already. Running the command
+`armadize` relies on Bundler being installed already. Running the command
 will have the following effects:
 
  * Ensure that a `config/armada` directory exists
@@ -88,45 +57,47 @@ in the same repo.
 
 ###Writing configs
 
-If you used `armadaize` you will have a base config scaffolded for you.
+If you used `armadize` you will have a base config scaffolded for you.
 But you'll still need to specify all of your configuration.
 
 Configs are in the form of a Rake task that uses a built-in DSL to make them
-easy to write. Here's a sample config for a project called "radio-radio" that
-would go into `config/armada/radio-radio.rake`:
+easy to write. Here's a sample config for a project called "zuulboy" that
+would go into `config/armada/zuulboy.rake`:
 
 ```ruby
 namespace :environment do
   task :common do
-    set :image, 'example.com/newrelic/radio-radio'
-    host 'docker-server-1.example.com'
-	host 'docker-server-2.example.com'
+    # set common attributes for your environment here!
+    set :image, 'quay.io/rallysoftware/zuul'
+    set :status_endpoint, '/metrics/healthcheck'
   end
 
-  desc 'Staging environment'
-  task :staging => :common do
-	set_current_environment(:staging)
-	env_vars YOUR_ENV: 'staging'
-	env_vars MY_DB: 'radio-db.example.com'
-    host_port 10234, container_port: 9292
-    host_port 10235, container_port: 9293
-	host_volume '/mnt/volume1', container_volume: '/mnt/volume2'
+  desc 'Boulder environment'
+  task :bld => :common do
+    set_current_environment(:bld)
+    env_vars LOG_DIR: "/home/zuul/logs/zuul"
+    host_port 3000, container_port: 3000
+    host 'bld-zb-01:4243'
+    host 'bld-zb-02:4243'
+    host 'bld-zb-03:4243' 
   end
 
-  desc 'Production environment'
-  task :production => :common do
-	set_current_environment(:production)
-	env_vars YOUR_ENV: 'production'
-	env_vars MY_DB: 'radio-db-prod.example.com'
-    host_port 22234, container_port: 9292
-    host_port 23235, container_port: 9293
+  desc 'Qwest Denver Production environment'
+  task :qd => :common do
+    set_current_environment(:qd)
+    env_vars LOG_DIR: "/home/zuul/logs/zuul"
+    host_port 3000, container_port: 3000
+    host 'qd-zb-01:4243'
+    host 'qd-zb-02:4243'
+    host 'qd-zb-03:4243'
   end
+
 end
 ```
 
-This sets up a staging and production environment and defines a `common` task
+This sets up a bld and qd environment and defines a `common` task
 that will be run in either case. Note the dependency call in the task
-definition for the `production` and `staging` tasks.  Additionally, it
+definition for the `qd` and `bld` tasks.  Additionally, it
 defines some host ports to map and sets which servers to deploy to. Some
 configuration will provided to the containers at startup time, in the form of
 environment variables.
@@ -151,7 +122,7 @@ the root path of the application. This is configurable by adding
 must respond with a valid response in the 200 status range.
 
 ````bash
-$ bundle exec armada -p radio-radio -e staging -a rolling_deploy
+$ bundle exec armada -p zuulboy -e bld -a rolling_deploy
 ````
 
 **Rolling Deployment Settings**:
@@ -179,7 +150,7 @@ is not recommended for apps where one endpoint needs to be available at all
 times.
 
 ````bash
-$ bundle exec armada -p radio-radio -e staging -a deploy
+$ bundle exec armada -p zuulboy -e bld -a deploy
 ````
 
 ###Deploy a bash console on a host
@@ -189,7 +160,7 @@ passed to the container. The `CMD` from the `Dockerfile` will be replaced
 with `/bin/bash`. It will use the first host from the host list.
 
 ````bash
-$ bundle exec armada -p radio-radio -e staging -a deploy_console
+$ bundle exec armada -p zuulboy -e bld -a deploy_console
 ````
 
 ###List all the tags running on your servers for a particular project
@@ -200,7 +171,7 @@ useful for validating the state of the deployment in the case where something
 goes wrong mid-deploy.
 
 ```bash
-$ bundle exec armada -p radio-radio -e staging -a list:running_container_tags
+$ bundle exec armada -p zuulboy -e bld -a list:running_container_tags
 ```
 
 ###List all the containers currently running for this project
@@ -209,7 +180,7 @@ Returns a (as yet not very nicely formatted) list of all the containers for
 this project on each of the servers from the config.
 
 ```bash
-$ bundle exec armada -p radio-radio -e staging -a list:running_containers
+$ bundle exec armada -p zuulboy -e bld -a list:running_containers
 ```
 
 ###List registry images
@@ -217,7 +188,7 @@ $ bundle exec armada -p radio-radio -e staging -a list:running_containers
 Returns a list of all the images for this project in the registry.
 
 ````bash
-$ bundle exec armada -p radio-radio -e staging -a list
+$ bundle exec armada -p zuulboy -e bld -a list
 ````
 
 Future Additions
@@ -230,30 +201,3 @@ We're currently looking at the following feature additions:
  * Certificate authentication
  * Customized tasks
  * Dynamic host allocation to a pool of servers
-
-Contributions
--------------
-
-Contributions are more than welcome. Bug reports with specific reproduction
-steps are great. If you have a code contribution you'd like to make, open a
-pull request with suggested code.
-
-Pull requests should:
-
- * Clearly state their intent in the title
- * Have a description that explains the need for the changes
- * Include tests!
- * Not break the public API
-
-If you are simply looking to contribute to the project, taking on one of the
-items in the "Future Additions" section above would be a great place to start.
-Ping us to let us know you're working on it by opening a GitHub Issue on the
-project.
-
-By contributing to this project you agree that you are granting New Relic a
-non-exclusive, non-revokable, no-cost license to use the code, algorithms,
-patents, and ideas in that code in our products if we so choose. You also agree
-the code is provided as-is and you provide no warranties as to its fitness or
-correctness for any purpose
-
-Copyright (c) 2014 New Relic, Inc. All rights reserved.
