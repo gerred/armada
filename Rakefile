@@ -17,9 +17,9 @@ end
 # Let bundler's release task do its job, minus the push to Rubygems,
 # and after it completes, use "gem inabox" to publish the gem to our
 # internal gem server.
-Rake::Task["release"].enhance do
-  gem_server_url = 'http://gems.f4tech.com'
-  spec = Gem::Specification::load(Dir.glob("*.gemspec").first)
-  sh "gem inabox pkg/#{spec.name}-#{spec.version}.gem --host #{gem_server_url}"
-end
+# Rake::Task["release"].enhance do
+#   gem_server_url = 'http://rallysoftware.artifactoryonline.com/rallysoftware/api/gems/repo1'
+#   spec = Gem::Specification::load(Dir.glob("*.gemspec").first)
+#   sh "gem inabox pkg/#{spec.name}-#{spec.version}.gem --host #{gem_server_url}"
+# end
 

@@ -201,39 +201,4 @@ describe Armada::Deploy do
       expect(new_container).to eq(container)
     end
   end
-
-  describe '#launch_console' do
-    let(:bindings) { {'80/tcp'=>[{'HostIp'=>'0.0.0.0', 'HostPort'=>'80'}]} }
-
-    it 'configures the container' do
-      expect(test_deploy).to receive(:container_config_for).with(server, 'image_id', bindings, nil, {}).once
-      test_deploy.stub(:start_container_with_config)
-
-      test_deploy.start_new_container(server, 'image_id', bindings, {})
-    end
-
-    it 'augments the container_config' do
-      expect(test_deploy).to receive(:start_container_with_config).with(server, {},
-        anything(),
-        hash_including('Cmd' => [ '/bin/bash' ], 'AttachStdin' => true , 'Tty' => true , 'OpenStdin' => true)
-      ).and_return({'Id' => 'shakespeare'})
-
-      test_deploy.launch_console(server, 'image_id', bindings, {})
-    end
-
-    it 'starts the console' do
-      # expect(test_deploy).to receive(:start_container_with_config).with(
-      #   server, {}, anything(), anything()
-      # ).and_return({'Id' => 'shakespeare'})
-
-      Docker::Container.should_receive(:create).with(any_args()).and_return(container)
-      expect(container).to receive(:start!).with(any_args()).and_return(container)
-      expect(container).to receive(:top)
-      
-      expect(container).to receive(:id).and_return(container["Id"]).twice
-  
-      test_deploy.launch_console(server, 'image_id', bindings, {})
-      # expect(server).to have_received(:attach).with('shakespeare')
-    end
-  end
 end
