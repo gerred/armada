@@ -1,4 +1,3 @@
-require 'armada/docker_registry'
 require 'armada/api'
 
 namespace :list do
