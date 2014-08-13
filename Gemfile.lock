@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    armada (0.0.1)
+    armada (1.0.1)
       docker-api (~> 1.13)
       excon (~> 0.33)
       logger-colors
