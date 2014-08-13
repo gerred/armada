@@ -21,6 +21,14 @@ module Armada::DeployDSL
     set(:registry_email, email)
   end
 
+  def container_name(name)
+    set(:container_name, name)
+  end
+
+  def health_check_port(port)
+    set(:health_check_port, port)
+  end
+
   def env_vars(new_vars)
     current = fetch(:env_vars, {})
     new_vars.each_pair do |new_key, new_value|

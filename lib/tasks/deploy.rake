@@ -30,7 +30,7 @@ namespace :deploy do
   # - remote: list
   # - remote: stop
   task :stop do
-    on_each_docker_host { |server| stop_containers(server, fetch(:port_bindings)) }
+    on_each_docker_host { |server| stop_containers(server, fetch(:container_name)) }
   end
 
   # start
@@ -41,37 +41,41 @@ namespace :deploy do
     on_each_docker_host do |server|
       start_new_container(
         server,
-        fetch(:image_id),
-        fetch(:port_bindings),
-        fetch(:binds),
-        fetch(:env_vars)
+        {
+          :port_bindings  => fetch(:port_bindings),
+          :binds          => fetch(:binds),
+          :env_vars       => fetch(:env_vars),
+          :container_name => fetch(:container_name)
+        }
       )
     end
   end
 
   task :rolling_deploy do
     on_each_docker_host do |server|
-      stop_containers(server, fetch(:port_bindings))
+      stop_containers(server, fetch(:container_name))
 
       start_new_container(
         server,
-        fetch(:image_id),
-        fetch(:port_bindings),
-        fetch(:binds),
-        fetch(:env_vars)
+        {
+          :port_bindings  => fetch(:port_bindings),
+          :binds          => fetch(:binds),
+          :env_vars       => fetch(:env_vars),
+          :container_name => fetch(:container_name)
+        }
       )
 
-      fetch(:port_bindings).each_pair do |container_port, host_ports|
-        wait_for_http_status_ok(
-          server,
-          host_ports.first['HostPort'],
-          fetch(:status_endpoint, '/'),
-          fetch(:image),
-          fetch(:tag),
-          fetch(:rolling_deploy_wait_time, 5),
-          fetch(:rolling_deploy_retries, 24)
-        )
-      end
+      
+      wait_for_http_status_ok(
+        server, 
+        {
+          :container_name           => fetch(:container_name),
+          :health_check_port        => fetch(:health_check_port),
+          :health_check_endpoint    => fetch(:health_check_endpoint, '/'),
+          :rolling_deploy_retries   => fetch(:rolling_deploy_retries, 60),
+          :rolling_deploy_wait_time => fetch(:rolling_deploy_wait_time, 1)
+        }
+      )
 
       wait_for_load_balancer_check_interval
     end

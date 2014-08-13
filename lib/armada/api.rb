@@ -17,6 +17,14 @@ module Armada
       containers
     end
 
+    def self.get_container_by_name(host, container_name, opts = {})  
+      Docker::Container.all(opts, host).each do |container|
+        container = Docker::Container.get(container.id, {}, container.connection)
+        return container if container.info["Name"].gsub!(/^\//, "") == container_name
+      end
+      nil
+    end
+
     def self.get_all_tags_for_image(host, image)
       tags = []
       Docker::Image.all({}, host).each do |i|
@@ -42,16 +50,6 @@ module Armada
       Docker::Image.all({}, host).each do |image|
         return image if image.id == container.json["Image"]
       end
-    end
-
-    def self.get_all_non_running_non_paused_containers(host)
-      containers = []
-      Docker::Container.all({:all => true}, host).each do |container|
-        container = Docker::Container.get(container.id, {}, container.connection)
-        state = container.json["State"]
-        containers << container if state["Running"] == false && state["Paused"] == false
-      end
-      containers
     end
 
     def self.get_non_running_containers(host)
