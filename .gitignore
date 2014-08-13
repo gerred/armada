@@ -2,10 +2,10 @@
 .config
 coverage/
 *.gem
-Gemfile.lock
 pkg/
 *.rbc
 *.swp
 *.swo
 tmp/
 .DS_Store
+VERSION
