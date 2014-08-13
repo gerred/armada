@@ -30,7 +30,7 @@ namespace :deploy do
   # - remote: list
   # - remote: stop
   task :stop do
-    on_each_docker_host { |server| stop_containers(server, fetch(:container_name)) }
+    on_each_docker_host { |server| stop_container(server, fetch(:container_name)) }
   end
 
   # start
@@ -53,7 +53,7 @@ namespace :deploy do
 
   task :rolling_deploy do
     on_each_docker_host do |server|
-      stop_containers(server, fetch(:container_name))
+      stop_container(server, fetch(:container_name))
 
       start_new_container(
         server,
