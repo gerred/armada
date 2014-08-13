@@ -1,5 +1,6 @@
 $: << File.expand_path("lib")
-require 'bundler/gem_tasks'
+require 'geminabox/rake'
+Geminabox::Rake.install host: 'http://gems.f4tech.com'
 
 begin
   require 'rspec/core/rake_task'
