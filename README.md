@@ -10,6 +10,7 @@ Installation
 ------------
 
 ```
+$ gem source -a http://rallysoftware.artifactoryonline.com/rallysoftware/api/gems/gems
 $ gem install armada
 ```
 
