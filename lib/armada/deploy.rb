@@ -14,7 +14,11 @@ module Armada::Deploy
       container.kill
 
       info "Deleting old container #{container.id[0..7]} (#{container_name})"
-      container.remove
+      begin
+        container.remove
+      rescue Exception => e
+        error "Could not remove container #{container.id[0..7]} (#{container_name}) on host #{URI.parse(host.url).host}:#{URI.parse(host.url).port} -- #{e.response.data[:body]}"
+      end
     else
       info "No container found with the name #{container_name}"
     end
