@@ -100,8 +100,12 @@ namespace :deploy do
     auth[:password] = fetch(:registry_password) if fetch(:registry_password)
     auth[:email]    = fetch(:registry_email)    if fetch(:registry_email)
     Armada::DockerServerGroup.new(fetch(:hosts)).each_in_parallel do |host|
-      image = Docker::Image.create({:fromImage => fetch(:image), :tag => fetch(:tag)}, auth, host)
-      set :image_id, image.id
+      begin
+        image = Docker::Image.create({:fromImage => fetch(:image), :tag => fetch(:tag)}, auth, host)
+        set :image_id, image.id
+      rescue Exception => e
+        puts "error:#{e.inspect}"
+      end
     end
   end
 

@@ -20,7 +20,7 @@ module Armada
     def self.get_container_by_name(host, container_name, opts = {})  
       Docker::Container.all(opts, host).each do |container|
         container = Docker::Container.get(container.id, {}, container.connection)
-        return container if container.info["Name"].gsub!(/^\//, "") == container_name
+        return container if container.info["Name"].gsub!(/^\//, "") == container_name && container.info["Image"][0..11] == opts[:image_id]
       end
       nil
     end
@@ -65,5 +65,6 @@ module Armada
     def self.tag_matches_image_name?(image_name, tags)
       image_name == tags.first.split(/:/).first
     end
+
   end
 end

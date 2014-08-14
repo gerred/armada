@@ -8,7 +8,7 @@ module Armada::Deploy
   FAILED_CONTAINER_VALIDATION = 100
 
   def stop_container(host, container_name)
-    container = Armada::Api.get_container_by_name(host, container_name)
+    container = Armada::Api.get_container_by_name(host, container_name, {:all => true, :image_id => fetch(:image_id)})
     if container
       info "Stopping old container #{container.id[0..7]} (#{container_name})"
       container.kill
@@ -76,8 +76,10 @@ module Armada::Deploy
   def cleanup_containers(host, public_port)
     old_containers = Armada::Api.get_non_running_containers(host)
     old_containers.each do |container| 
-      info "Removing the following container - #{container.id[0..11]}"
-      container.remove
+      # need better cleanup algorithm
+      #container_name = container.info["Name"].gsub!(/^\//, "")
+      #info "Removing the following container - #{container_name} #{container.id[0..11]}"
+      #container.remove unless container_name =~ /spoon*/
     end
   end
 
@@ -110,8 +112,6 @@ module Armada::Deploy
       container_config['name'] = opts[:container_name]
       #should we do soemthing if container namae isnt set?
     end
-
-    puts "config:#{container_config}"
     container_config
   end
 
@@ -128,7 +128,7 @@ module Armada::Deploy
     begin
       container = Docker::Container.create(container_config, host)
     rescue Excon::Errors::Conflict => e
-      raise "Error occured: #{e.response.data[:body]}"
+      raise "Error occured on #{URI.parse(host.url).host}:#{URI.parse(host.url).port}: #{e.response.data[:body]}"
     end
 
     host_config = {}

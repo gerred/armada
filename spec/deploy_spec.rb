@@ -94,17 +94,17 @@ describe Armada::Deploy do
     end
   end
 
-  describe '#cleanup_containers' do
-    it 'deletes all but two containers' do
-      Armada::Api.should_receive(:get_non_running_containers).with(any_args()).and_return([container])
-      expect(container).to receive(:id).and_return(container["Id"])
+  # describe '#cleanup_containers' do
+  #   it 'deletes all but two containers' do
+  #     Armada::Api.should_receive(:get_non_running_containers).with(any_args()).and_return([container])
+  #     expect(container).to receive(:id).and_return(container["Id"])
 
-      expect(container).to receive(:remove)
+  #     expect(container).to receive(:remove)
 
-      #this is changing because we no longer can clean up containers by port...
-      test_deploy.cleanup_containers(server, {'80/tcp' => [{'HostIp' => '0.0.0.0', 'HostPort' => port.to_s}]})
-    end
-  end
+  #     #this is changing because we no longer can clean up containers by port...
+  #     test_deploy.cleanup_containers(server, {'80/tcp' => [{'HostIp' => '0.0.0.0', 'HostPort' => port.to_s}]})
+  #   end
+  # end
 
   # describe '#stop_container' do
   #   it 'calls stop_container on the right containers' do
