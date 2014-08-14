@@ -156,7 +156,7 @@ describe Armada::Deploy do
 
     it 'handles mapping host volumes' do
       expect(test_deploy).to receive(:fetch).with(:image_id).and_return('foo')
-      config = test_deploy.container_config_for(server, {:volumes => ["/tmp/foo:/tmp/chaucer"]})
+      config = test_deploy.container_config_for(server, {:binds => ["/tmp/foo:/tmp/chaucer"]})
 
       expect(config).to be_a(Hash)
       expect(config.keys).to match_array(%w{ Hostname Image Volumes VolumesFrom })
@@ -186,7 +186,7 @@ describe Armada::Deploy do
       expect(test_deploy).to receive(:fetch).with(:image_id).and_return('foo')
       expect(test_deploy).to receive(:start_container_with_config).with(server, [], bindings, anything())
 
-      test_deploy.start_new_container(server, {:port_bindings => bindings, :volumes => []})
+      test_deploy.start_new_container(server, {:port_bindings => bindings, :binds => []})
     end
 
     it 'ultimately asks the server object to do the work' do
