@@ -8,7 +8,7 @@ module Armada::Deploy
   FAILED_CONTAINER_VALIDATION = 100
 
   def stop_container(host, container_name)
-    container = Armada::Api.get_container_by_name(host, container_name, {:all => true, :image_id => fetch(:image_id)})
+    container = Armada::Api.get_container_by_name(host, container_name, {:all => true})
     if container
       info "Stopping old container #{container.id[0..7]} (#{container_name})"
       container.kill
@@ -21,7 +21,7 @@ module Armada::Deploy
   end
 
   def wait_for_http_status_ok(host, opts = {})
-    info 'Waiting for the port to come up'
+    info 'Waiting for the container to come up'
     1.upto(opts[:rolling_deploy_retries]) do
       if container_up?(host, opts[:container_name]) && http_status_ok?(host, opts[:health_check_port], opts[:health_check_endpoint])
         info 'Container is up!'
@@ -39,9 +39,6 @@ module Armada::Deploy
   end
 
   def container_up?(host, container_name)
-    # The API returns a record set like this:
-    #[{"Command"=>"script/run ", "Created"=>1394470428, "Id"=>"41a68bda6eb0a5bb78bbde19363e543f9c4f0e845a3eb130a6253972051bffb0", "Image"=>"quay.io/newrelic/rubicon:5f23ac3fad7979cd1efdc9295e0d8c5707d1c806", "Names"=>["/happy_pike"], "Ports"=>[{"IP"=>"0.0.0.0", "PrivatePort"=>80, "PublicPort"=>8484, "Type"=>"tcp"}], "Status"=>"Up 13 seconds"}]
-
     container = Armada::Api.get_container_by_name(host, container_name)
     
     if container

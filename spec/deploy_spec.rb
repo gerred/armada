@@ -67,7 +67,7 @@ describe Armada::Deploy do
       test_deploy.stub(:http_status_ok? => true)
 
       test_deploy.wait_for_http_status_ok(server, {:health_check_port => port, :health_check_endpoint => '/foo', :rolling_deploy_retries => 1, :rolling_deploy_wait_time => 0})
-      expect(test_deploy).to have_received(:info).with(/Waiting for the port/)
+      expect(test_deploy).to have_received(:info).with(/Waiting for the container/)
       expect(test_deploy).to have_received(:info).with('Container is up!')
     end
 
@@ -79,7 +79,7 @@ describe Armada::Deploy do
       expect(test_deploy).to receive(:sleep).with(0)
        
       test_deploy.wait_for_http_status_ok(server, {:health_check_port => port, :health_check_endpoint => '/foo', :rolling_deploy_retries => 1, :rolling_deploy_wait_time => 0})
-      expect(test_deploy).to have_received(:info).with(/Waiting for the port/)
+      expect(test_deploy).to have_received(:info).with(/Waiting for the container/)
     end
 
     it 'waits when the HTTP status is not OK' do
@@ -90,7 +90,7 @@ describe Armada::Deploy do
       expect(test_deploy).to receive(:exit)
        
       test_deploy.wait_for_http_status_ok(server, {:health_check_port => port, :health_check_endpoint => '/foo', :rolling_deploy_retries => 1, :rolling_deploy_wait_time => 0})
-      expect(test_deploy).to have_received(:info).with(/Waiting for the port/)
+      expect(test_deploy).to have_received(:info).with(/Waiting for the container/)
     end
   end
 

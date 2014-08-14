@@ -3,6 +3,10 @@ require 'excon'
 require 'armada/deploy'
 require 'armada/api'
 
+task :stop do
+  invoke 'deploy:stop'
+end
+
 task :deploy do
   invoke 'deploy:get_image'
   invoke 'deploy:stop'
@@ -114,14 +118,9 @@ namespace :deploy do
       image = Docker::Image.get(fetch(:image_id), {}, host)
       
       if image.id[0..11] == fetch(:image_id)
-        debug "Image #{image.id[0..11]} found on #{host.url}"
+        info "Image #{fetch(:image)}:#{fetch(:tag)} with ID:#{image.id[0..11]} found on #{host.url}"
       else
         raise "Did not find image #{fetch(:image_id)} on host #{host.url}!"
-      end
-
-      # Print the container config
-      image.info["ContainerConfig"].each_pair do |key,value|
-        debug "\t#{key} => #{value.inspect}"
       end
     end
   end
