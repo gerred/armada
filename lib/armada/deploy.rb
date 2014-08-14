@@ -100,8 +100,8 @@ module Armada::Deploy
       container_config['Env'] = opts[:env_vars].map { |k,v| "#{k}=#{v}" }
     end
 
-    if opts[:volumes]
-      container_config['Volumes'] = opts[:volumes].inject({}) do |memo, v|
+    if opts[:binds]
+      container_config['Volumes'] = opts[:binds].inject({}) do |memo, v|
         memo[v.split(/:/).last] = {}
         memo
       end
@@ -117,7 +117,7 @@ module Armada::Deploy
 
   def start_new_container(host, opts = {})
     container_config = container_config_for(host, opts)
-    start_container_with_config(host, opts[:volumes], opts[:port_bindings], container_config)
+    start_container_with_config(host, opts[:binds], opts[:port_bindings], container_config)
   end
 
   private
