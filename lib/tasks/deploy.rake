@@ -28,6 +28,11 @@ namespace :deploy do
   task :get_image do
     if fetch(:no_pull)
       info "--no-pull option specified: skipping pull"
+      if fetch(:image_id)
+        info "Using image id - #{fetch(:image_id)}"
+      else
+        raise "You must set an image_id if you are using the --no-pull option."
+      end
     else
       invoke 'deploy:pull_image'
       invoke 'deploy:verify_image'
