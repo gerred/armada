@@ -26,8 +26,12 @@ namespace :deploy do
   include Armada::Deploy
 
   task :get_image do
-    invoke 'deploy:pull_image'
-    invoke 'deploy:verify_image'
+    if fetch(:no_pull)
+      info "--no-pull option specified: skipping pull"
+    else
+      invoke 'deploy:pull_image'
+      invoke 'deploy:verify_image'
+    end
   end
 
   # stop
@@ -93,12 +97,7 @@ namespace :deploy do
   end
 
   task :pull_image do
-    if fetch(:no_pull)
-      info "--no-pull option specified: skipping pull"
-      next
-    end
-    $stderr.puts "Fetching image #{fetch(:image)}:#{fetch(:tag)} IN PARALLEL\n"
-
+    info "Fetching image #{fetch(:image)}:#{fetch(:tag)} IN PARALLEL\n"
     auth = {}
     auth[:username] = fetch(:registry_username) if fetch(:registry_username)
     auth[:password] = fetch(:registry_password) if fetch(:registry_password)
