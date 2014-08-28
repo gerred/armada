@@ -1,32 +1,58 @@
-require_relative 'api'
-require_relative 'docker_server_group'
-require 'uri'
+require 'singleton'
 
 module Armada::DeployDSL
-  def on_each_docker_host(&block)
-    Armada::DockerServerGroup.new(fetch(:hosts, [])).tap do |hosts|
-      hosts.each { |host| block.call(host) }
+  class CurrentEnvironmentNotSetError < RuntimeError; end
+
+  class Store < Hash
+    include Singleton
+  end
+
+  def env
+    Store.instance
+  end
+
+  def fetch(key, default=nil, &block)
+    env[current_environment][key] || default
+  end
+
+  def any?(key)
+    value = fetch(key)
+    if value && value.respond_to?(:any?)
+      value.any?
+    else
+      !fetch(key).nil?
     end
   end
 
+<<<<<<< HEAD
   def registry_username(username)
     set(:registry_username, username)
+=======
+  def set(key, value)
+    env[current_environment][key] = value
+>>>>>>> [major]
   end
 
-  def registry_password(password)
-    set(:registry_password, password)
+  def delete(key)
+    env[current_environment].delete(key)
   end
 
-  def registry_email(email)
-    set(:registry_email, email)
+  def set_current_environment(environment)
+    env[:current_environment] = environment
+    env[environment] ||= {}
+  end
+
+  def current_environment
+    raise CurrentEnvironmentNotSetError.new('Must set current environment') unless env[:current_environment]
+    env[:current_environment]
+  end
+
+  def clear_env
+    env.clear
   end
 
   def container_name(name)
     set(:container_name, name)
-  end
-
-  def health_check_port(port)
-    set(:health_check_port, port)
   end
 
   def env_vars(new_vars)
@@ -77,15 +103,6 @@ module Armada::DeployDSL
 
     binds << "#{volume}:#{container_volume}"
     set(:binds, binds)
-  end
-
-  def get_current_tags_for(image)
-    hosts = Armada::DockerServerGroup.new(fetch(:hosts))
-    hosts.inject([]) do |memo, host|
-      tags = Armada::Api.get_all_tags_for_image(host, image)
-      memo += [{ server: URI.parse(host.url).host, tags: tags }] if tags
-      memo
-    end
   end
 
   private
