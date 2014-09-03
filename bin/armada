@@ -39,7 +39,7 @@ set :project, opts[:project]
 set :environment, opts[:environment]
 
 # Load the per-project config and execute the task for the current environment
-projects_dir = File.join(Dir.getwd(), 'config', 'Armada')
+projects_dir = File.join(Dir.getwd(), 'config', 'armada')
 config_file  = "#{opts[:project]}.rake"
 if File.exists?(File.join(projects_dir, config_file))
   load File.join(File.join(projects_dir, config_file))
