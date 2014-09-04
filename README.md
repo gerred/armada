@@ -127,12 +127,12 @@ $ bundle exec armada -p zuulboy -e bld -a list:running_containers
 ```
 
 ### Armada Command line options
-#### project <--project, -p>
-#### environment <--environment, -e>
-#### action <--action, -a>
-#### image <--image, -i>
-#### tag <--tag, -t>
-#### hosts <--hosts, -h>
-#### username <--username, -u>
-#### password <--password, -s>
-#### no-pull <--no-pull, -n>
+##### project <--project, -p>
+##### environment <--environment, -e>
+##### action <--action, -a>
+##### image <--image, -i>
+##### tag <--tag, -t>
+##### hosts <--hosts, -h>
+##### username <--username, -u>
+##### password <--password, -s>
+##### no-pull <--no-pull, -n>
