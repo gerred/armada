@@ -1,65 +1,19 @@
-armada
-=========
+# armada
 
 A deployment tool for Docker. Takes containers from a Docker registry and runs
 them on a fleet of hosts with the correct environment variables, host volume
 mappings, and port mappings. Supports rolling deployments out of the box, and
 makes it easy to ship applications to Docker servers.
 
-Installation
-------------
+## Installation
+
 
 ```
-$ gem source -a http://rallysoftware.artifactoryonline.com/rallysoftware/api/gems/gems
+$ gem source -a http://gems.f4tech.com
 $ gem install armada
 ```
 
-With rbenv you will now need to do an `rbenv rehash` and the commands should
-be available. With a non-rbenv install, assuming the gem dir is in your path,
-the commands should just work now.
-
-Configuration
--------------
-
-Armada expects to find configuration tasks in the current working directory.
-Soon it will also support reading configuration from etcd.
-
-We recommend putting all your configuration for multiple applications into a
-single repo rather than spreading it around by project. This allows a central
-choke point on configuration changes between applications and tends to work
-well with the hand-off in many organizations between the build and deploy
-steps. If you only have one application, or don't need this you can
-decentralize the config into each repo.
-
-It will look for configuration files in either `./config/armada` or `.`.
-
-The pattern at New Relic is to have a configs repo with a `Gemfile` that
-sources the armada gem. If you want armada to set up the structure for
-you and to create a sample config, you can simply run `armadize` once you
-have the Ruby Gem installed.
-
-armada ships with a simple scaffolding tool that will setup a new config repo for
-you, as well as scaffold individual project configs. Here's how you run it:
-
-```bash
-$ armadize -p <your_project>
-```
-
-`armadize` relies on Bundler being installed already. Running the command
-will have the following effects:
-
- * Ensure that a `config/armada` directory exists
- * Scaffold an example config for your project (you can specify the registry)
- * Ensure that a Gemfile is present
- * Ensure that armada is in the Gemfile (if absent it just appends it)
-
-Any time you add a new project you can scaffold it in the same manner even
-in the same repo.
-
-###Writing configs
-
-If you used `armadize` you will have a base config scaffolded for you.
-But you'll still need to specify all of your configuration.
+### Writing configs
 
 Configs are in the form of a Rake task that uses a built-in DSL to make them
 easy to write. Here's a sample config for a project called "zuulboy" that
@@ -106,20 +60,25 @@ environment variables.
 All of the DSL items (`host_port`, `host_volume`, `env_vars`, `host`) can be
 specified more than once and will append to the configuration.
 
-Deploying
----------
+#### DSL
+##### host_port
+##### host_volume
+##### env_vars
+##### host
+
+### Deploying
 
 armada supports a number of tasks out of the box that make working with
 distributed containers easy.  Here are some examples:
 
-###Do a rolling deployment to a fleet of Docker servers
+#### Do a rolling deployment to a fleet of Docker servers
 
 A rolling deployment will stop and start each container one at a time to make
 sure that the application stays available from the viewpoint of the load
 balancer. As the deploy runs, a health check will hit each container to ensure
 that the application booted correctly. By default, this will be a GET request to
 the root path of the application. This is configurable by adding
-`set(:status_endpoint, '/somewhere/else')` in your config. The status endpoint
+`set :health_check_endpoint, '/metrics/healthcheck'` in your config. The health check endpoint
 must respond with a valid response in the 200 status range.
 
 ````bash
@@ -132,19 +91,12 @@ deployment behaves. Each of these is controlled with `set(:var_name, 'value')`.
 These can be different for each environment or put into a common block if they
 are the same everywhere. Settings are per-project.
 
- * `rolling_deploy_check_interval` => Controls how long armada will wait after
-    seeing a container as up before moving on to the next one. This should be
-    slightly longer than your load balancer check interval. Value in seconds.
-    Defaults to 5 seconds.
  * `rolling_deploy_wait_time` => The amount of time to wait between unsuccessful
-    health checks before retrying. Value in seconds. Defaults to 5 seconds.
+    health checks before retrying. Value in seconds. Defaults to 1 second.
  * `rolling_deploy_retries` => The number of times to retry a health check on
-   the container once it is running. This count multiplied by the
-   `rolling_deployment_wait_time` is the total time armada will wait for
-   an individual container to come up before giving up as a failure. Defaults
-   to 24 attempts.
+   the container once it is running. Defaults to 60
 
-###Deploy a project to a fleet of Docker servers
+### Deploy a project to a fleet of Docker servers
 
 This will hard stop, then start containers on all the specified hosts. This
 is not recommended for apps where one endpoint needs to be available at all
@@ -152,16 +104,6 @@ times.
 
 ````bash
 $ bundle exec armada -p zuulboy -e bld -a deploy
-````
-
-###Deploy a bash console on a host
-
-This will give you a command line shell with all of your existing environment
-passed to the container. The `CMD` from the `Dockerfile` will be replaced
-with `/bin/bash`. It will use the first host from the host list.
-
-````bash
-$ bundle exec armada -p zuulboy -e bld -a deploy_console
 ````
 
 ###List all the tags running on your servers for a particular project
@@ -184,25 +126,13 @@ this project on each of the servers from the config.
 $ bundle exec armada -p zuulboy -e bld -a list:running_containers
 ```
 
-###List registry images
-
-Returns a list of all the images for this project in the registry.
-
-````bash
-$ bundle exec armada -p zuulboy -e bld -a list
-````
-
-### Release process
-* rake spec 
-* rake release
-
-Future Additions
-----------------
-
-We're currently looking at the following feature additions:
-
- * [etcd](https://github.com/coreos/etcd) integration for configs and discovery
- * Add the ability to show all the available tasks on the command line
- * Certificate authentication
- * Customized tasks
- * Dynamic host allocation to a pool of servers
+### Armada Command line options
+#### project <--project, -p>
+#### environment <--environment, -e>
+#### action <--action, -a>
+#### image <--image, -i>
+#### tag <--tag, -t>
+#### hosts <--hosts, -h>
+#### username <--username, -u>
+#### password <--password, -s>
+#### no-pull <--no-pull, -n>
