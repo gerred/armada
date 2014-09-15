@@ -78,9 +78,9 @@ namespace :deploy do
         }
       )
 
-      
+
       wait_for_http_status_ok(
-        server, 
+        server,
         {
           :container_name           => fetch(:container_name),
           :health_check_port        => fetch(:health_check_port),
@@ -119,11 +119,12 @@ namespace :deploy do
 
   task :verify_image do
     on_each_docker_host do |host|
-      image = Docker::Image.get(fetch(:image_id), {}, host)
-      
-      if image.id[0..11] == fetch(:image_id)
-        info "Image #{fetch(:image)}:#{fetch(:tag)} with ID:#{image.id[0..11]} found on #{host.url}"
-      else
+      begin
+        image = Docker::Image.get(fetch(:image_id), {}, host)
+        if image.id[0..11] == fetch(:image_id)
+          info "Image #{fetch(:image)}:#{fetch(:tag)} with ID:#{image.id[0..11]} found on #{host.url}"
+        end
+      rescue Exception
         raise "Did not find image #{fetch(:image_id)} on host #{host.url}!"
       end
     end

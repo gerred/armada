@@ -10,7 +10,7 @@ module Armada::DeployDSL
   end
 
   def registry_username(username)
-    set(:registry_username, username) 
+    set(:registry_username, username)
   end
 
   def registry_password(password)
@@ -51,11 +51,12 @@ module Armada::DeployDSL
   end
 
   def host_port(port, options)
+    puts "HOST PORT: #{port} --- #{options.inspect}"
     validate_options_keys(options, [ :host_ip, :container_port, :type ])
     require_options_keys(options,  [ :container_port ])
 
     add_to_bindings(
-      options[:host_ip] || '0.0.0.0', 
+      options[:host_ip] || '0.0.0.0',
       options[:container_port],
       port,
       options[:type] || 'tcp'
@@ -80,7 +81,7 @@ module Armada::DeployDSL
   end
 
   def get_current_tags_for(image)
-    hosts = Armada::DockerServerGroup.new(fetch(:hosts)) 
+    hosts = Armada::DockerServerGroup.new(fetch(:hosts))
     hosts.inject([]) do |memo, host|
       tags = Armada::Api.get_all_tags_for_image(host, image)
       memo += [{ server: URI.parse(host.url).host, tags: tags }] if tags
@@ -91,12 +92,9 @@ module Armada::DeployDSL
   private
 
   def add_to_bindings(host_ip, container_port, port, type='tcp')
-    set(:port_bindings, fetch(:port_bindings, {}).tap do |bindings|
-      bindings["#{container_port.to_s}/#{type}"] = [
-        {'HostIp' => host_ip, 'HostPort' => port.to_s}
-      ]
-      bindings
-    end)
+    ports = fetch(:port_bindings, {})
+    ports["#{container_port.to_s}/#{type}"] = [{'HostIp' => host_ip, 'HostPort' => port.to_s}]
+    set(:port_bindings, ports)
   end
 
   def validate_options_keys(options, valid_keys)
