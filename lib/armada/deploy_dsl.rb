@@ -51,7 +51,6 @@ module Armada::DeployDSL
   end
 
   def host_port(port, options)
-    puts "HOST PORT: #{port} --- #{options.inspect}"
     validate_options_keys(options, [ :host_ip, :container_port, :type ])
     require_options_keys(options,  [ :container_port ])
 
