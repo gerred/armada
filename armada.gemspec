@@ -17,17 +17,16 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'trollop'
   spec.add_dependency 'excon', '~> 0.33'
-  spec.add_dependency 'logger-colors'
   spec.add_dependency 'docker-api', '~> 1.13'
+  spec.add_dependency 'thor', '~> 0.19'
+  spec.add_dependency 'awesome_print'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 2.14.0'
-  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'thor-scmversion', '< 1.6.0'
-  spec.add_development_dependency "geminabox", "~> 0.10"
+  spec.add_development_dependency 'geminabox', '~> 0.10'
 
   spec.required_ruby_version = '>= 1.9.3'
 end
