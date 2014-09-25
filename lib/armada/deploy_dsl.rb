@@ -24,13 +24,8 @@ module Armada::DeployDSL
     end
   end
 
-<<<<<<< HEAD
-  def registry_username(username)
-    set(:registry_username, username)
-=======
   def set(key, value)
     env[current_environment][key] = value
->>>>>>> [major]
   end
 
   def delete(key)
