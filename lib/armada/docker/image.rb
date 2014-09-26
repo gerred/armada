@@ -24,6 +24,10 @@ module Armada
       end
     end
 
+    def self.get(id, connection)
+      Docker::Image.get(id, {}, connection)
+    end
+
     def auth(username, password, email = "")
       return { :username => username, :password => password, :email => email } if username && password
       return {}

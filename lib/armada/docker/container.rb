@@ -37,7 +37,7 @@ module Armada
       container.start!(create_host_config(@options))
     end
 
-    def wait
+    def wait_for_container
       info 'Waiting for the container to come up'
       1.upto(@options[:deploy_retries]) do
         if container_up?
@@ -48,7 +48,7 @@ module Armada
       end
     end
 
-    def check_health
+    def health_check
       info "Performing health check at - :#{@options[:health_check_port]}#{@options[:health_check_endpoint]}. Will retry every #{@options[:deploy_wait_time]} second(s) for #{@options[:deploy_retries]} times."
       1.upto(@options[:deploy_retries]) do |i|
         unless healthy?(@host, @options[:health_check_endpoint], @options[:health_check_port])
@@ -68,7 +68,7 @@ module Armada
     # I wonder if we should also check ot see if the container has exited here?
     def container_up?
       if @container
-        time = Time.parse(@container.json["State"]["StartedAt"]) - Time.now
+        time = Time.now - Time.parse(@container.json["State"]["StartedAt"])
         info "Found container up for #{time.round(2)} seconds"
         return true
       end
@@ -76,19 +76,19 @@ module Armada
     end
 
     def find_by_name(name)
-      all.each do |found_container|
+      Container::all(@connection).each do |found_container|
         container = get(found_container.id)
         return container if container.info["Name"].gsub!(/^\//, "") == name
       end
       nil
     end
 
-    def get(id)
-      Docker::Container.get(id, {}, @connection)
+    def self.all(connection)
+      Docker::Container.all({:all => true}, connection)
     end
 
-    def all
-      Docker::Container.all({:all => true}, @connection)
+    def get(id)
+      Docker::Container.get(id, {}, @connection)
     end
 
     def create(container_config)
@@ -165,6 +165,8 @@ module Armada
       warn "Got HTTP status: #{response.status}"
       false
     end
+
+    private
 
     def info(message)
       Armada.ui.info "#{URI.parse(@connection.url).host} -- #{message}"

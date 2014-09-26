@@ -7,7 +7,7 @@ module Armada
     option :tag,          :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
     option :username,     :type => :string,  :aliases => :u, :desc => "Docker registry username"
     option :password,     :type => :string,  :aliases => :p, :desc => "Docker registry password"
-    option :check_health, :type => :boolean, :aliases => :c, :desc => "Perform health check of container", :default => false, :lazy_default => true
+    option :health_check, :type => :boolean, :aliases => :c, :desc => "Perform health check of container", :default => false, :lazy_default => true
     def parallel(project, environment)
       @options = Armada::Configuration.load!(project, environment, @options)
       Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')} in PARALLEL"
@@ -20,17 +20,18 @@ module Armada
         container = Armada::Container.new(image, @options, connection)
         container.stop
         container.start
-        container.wait
-        container.check_health if @options[:check_health]
+        container.wait_for_container
+        container.health_check if @options[:health_check]
       end
     end
 
     desc "rolling <project> <environment>", "Perform a rolling deploy across a set of hosts."
-    option :hosts,    :type => :array,  :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
-    option :image,    :type => :string, :aliases => :i, :desc => "The image to use when deploying"
-    option :tag,      :type => :string, :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
-    option :username, :type => :string, :aliases => :u, :desc => "Docker registry username"
-    option :password, :type => :string, :aliases => :p, :desc => "Docker registry password"
+    option :hosts,        :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
+    option :image,        :type => :string,  :aliases => :i, :desc => "The image to use when deploying"
+    option :tag,          :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
+    option :username,     :type => :string,  :aliases => :u, :desc => "Docker registry username"
+    option :password,     :type => :string,  :aliases => :p, :desc => "Docker registry password"
+    option :health_check, :type => :boolean, :aliases => :c, :desc => "Perform health check of container. Default is true", :default => true
     def rolling(project, environment)
       @options = Armada::Configuration.load!(project, environment, @options)
       Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')}"
@@ -43,8 +44,8 @@ module Armada
         container = Armada::Container.new(image, @options, connection)
         container.stop
         container.start
-        container.wait
-        container.check_health
+        container.wait_for_container
+        container.health_check if options[:health_check]
       end
     end
 

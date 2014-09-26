@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'docker-api', '~> 1.13'
   spec.add_dependency 'thor', '~> 0.19'
   spec.add_dependency 'awesome_print'
+  spec.add_dependency 'table_print'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
