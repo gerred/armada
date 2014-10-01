@@ -7,34 +7,33 @@ module Armada
       @image          = image
       @name           = options[:container_name]
       @connection     = connection
-      @container      = find_by_name(@name)
+      @container      = Armada::Container.find_by_name(@name, @connection)
       @options        = options
       @host           = URI.parse(connection.url).host
     end
 
     def stop
-      info "Stopping all running containers named - #{@name}"
       if @container
+        info "Stopping the running container named - #{@name}"
         kill
         remove
       else
-        info "No container found with the name #{@name}"
+        warn "No container found with the name #{@name}"
       end
     end
 
     def start
       info "Creating new container for image - #{@image.name}:#{@image.tag} (#{@image.id}) with name #{@name}"
-      container_config = create_container_config(@image.id, @name, @host, @options)
+      container_config = Armada::Container.create_container_config(@image.id, @name, @host, @options)
       begin
         @container = create(container_config)
-        @id = container.id
+        @id = @container.id
+        info "Starting new container #{@id[0..11]}"
+        @container.start!(Armada::Container.create_host_config(@options))
       rescue Excon::Errors::Conflict => e
-        uri = URI.parse(connection.url)
+        uri = URI.parse(@connection.url)
         raise "Error occured on #{uri.host}:#{uri.port}: #{e.response.data[:body]}"
       end
-
-      info "Starting new container #{@id[0..11]}"
-      container.start!(create_host_config(@options))
     end
 
     def wait_for_container
@@ -51,13 +50,13 @@ module Armada
     def health_check
       info "Performing health check at - :#{@options[:health_check_port]}#{@options[:health_check_endpoint]}. Will retry every #{@options[:deploy_wait_time]} second(s) for #{@options[:deploy_retries]} times."
       1.upto(@options[:deploy_retries]) do |i|
-        unless healthy?(@host, @options[:health_check_endpoint], @options[:health_check_port])
+        unless Armada::Container.healthy?(@host, @options[:health_check_endpoint], @options[:health_check_port])
           info "Still waiting for health check to pass at - :#{@options[:health_check_port]}#{@options[:health_check_endpoint]} endpoint..." if i % (@options[:deploy_retries]/10) == 0
           sleep(@options[:deploy_wait_time])
         end
       end
 
-      unless healthy?(@host, @options[:health_check_endpoint], @options[:health_check_port])
+      unless Armada::Container.healthy?(@host, @options[:health_check_endpoint], @options[:health_check_port])
         error "Failed to validate started container on #{@host}:#{@options[:health_check_port]}"
         raise
       else
@@ -75,10 +74,30 @@ module Armada
       false
     end
 
-    def find_by_name(name)
-      Container::all(@connection).each do |found_container|
-        container = get(found_container.id)
-        return container if container.info["Name"].gsub!(/^\//, "") == name
+    def create(container_config)
+      Docker::Container.create(container_config, @connection)
+    end
+
+    def kill
+      return if @container.nil?
+      info "Stopping old container #{@container.id[0..7]} (#{@name})"
+      @container.kill
+    end
+
+    def remove
+      return if @container.nil?
+      info "Deleting old container #{@container.id[0..7]} (#{@name})"
+      begin
+        @container.remove
+      rescue Exception => e
+        error "Could not remove container #{@container.id[0..7]} (#{@name}).\nException was: #{e.message}"
+      end
+    end
+
+    def self.find_by_name(name, connection)
+      name = "/#{name}" unless name.start_with?("/")
+      Armada::Container.all(connection).each do |container|
+        return container if container.info["Names"].include? name
       end
       nil
     end
@@ -87,31 +106,11 @@ module Armada
       Docker::Container.all({:all => true}, connection)
     end
 
-    def get(id)
-      Docker::Container.get(id, {}, @connection)
+    def self.get(id, connection)
+      Docker::Container.get(id, {}, connection)
     end
 
-    def create(container_config)
-      Docker::Container.create(container_config, @connection)
-    end
-
-    def kill
-      return if @container.nil?
-      info "Stopping old container #{@container.id[0..7]} (#{@container.info['Name']})"
-      @container.kill
-    end
-
-    def remove
-      return if container.nil?
-      info "Deleting old container #{@container.id[0..7]} (#{@container.info['Name']})"
-      begin
-        @container.remove
-      rescue Exception
-        error "Could not remove container #{@container.id[0..7]} (#{@container.info['Name']})"
-      end
-    end
-
-    def create_host_config(options)
+    def self.create_host_config(options)
       host_config = {}
       host_config['Binds'] = options[:binds] if options[:binds] && !options[:binds].empty?
       host_config['PortBindings'] = options[:port_bindings] if options[:port_bindings]
@@ -119,9 +118,9 @@ module Armada
       host_config
     end
 
-    def create_container_config(image_id, container_name, host, options = {})
+    def self.create_container_config(image_id, container_name, host, options = {})
       container_config = {
-        'Image'        => @image.id,
+        'Image'        => image_id,
         'Hostname'     => host,
       }
 
@@ -151,7 +150,7 @@ module Armada
       container_config
     end
 
-    def healthy?(host, endpoint, port)
+    def self.healthy?(host, endpoint, port)
       url = "http://#{host}:#{port}#{endpoint}"
       response = begin
         Excon.get(url)

@@ -17,7 +17,7 @@ module Armada
         info "Pulling image [#{@name}] with tag #{@tag}"
         begin
           @image = Docker::Image.create({:fromImage => @name, :tag => @tag}, @auth, @connection)
-          @id = image.id
+          @id = @image.id
         rescue Exception => e
           error "#{e.inspect} \n #{e.backtrace.join("\n")}"
         end
