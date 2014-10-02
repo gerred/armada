@@ -1,37 +1,34 @@
-# armada
+## Description
 
-A deployment tool for Docker. Takes containers from a Docker registry and runs
-them on a fleet of hosts with the correct environment variables, host volume
-mappings, and port mappings. Supports rolling deployments out of the box, and
-makes it easy to ship applications to Docker servers.
+Armada is a docker deployment tool which we originally forked from the [NewRelic Centurion](https://github.com/newrelic/centurion) project. It has since seen a huge refactor occur where we started using the [swipely/docker-api](https://github.com/swipely/docker-api) gem for interacting with our docker hosts instead of the mix of docker-cli and api calls that Centurion makes. The DSL is largely unchanged as it works really well for our intended purposes. 
 
 ## Installation
-
 
 ```
 $ gem source -a http://gems.f4tech.com
 $ gem install armada
 ```
 
-### Writing configs
+## Writing your service descriptor
+Currently, all descriptors live at [RallySoftware/armada-configs](https://github.com/RallySoftware/armada-configs) in the `config/armada` directory. 
 
-Configs are in the form of a Rake task that uses a built-in DSL to make them
-easy to write. Here's a sample config for a project called "zuulboy" that
+Descriptors are in the form of a Rake task that uses a built-in DSL to make them
+easy to write. Here's a sample config for a project called `zuulboy` that
 would go into `config/armada/zuulboy.rake`:
 
 ```ruby
 namespace :environment do
   task :common do
-    # set common attributes for your environment here!
+    env_vars LOG_DIR: "/home/zuul/logs/zuul"
+    host_port 3000, container_port: 3000
     set :image, 'quay.io/rallysoftware/zuul'
-    set :status_endpoint, '/metrics/healthcheck'
+    set :health_check_endpoint, '/metrics/healthcheck'
+    set :health_check_port, 3000
   end
 
   desc 'Boulder environment'
   task :bld => :common do
     set_current_environment(:bld)
-    env_vars LOG_DIR: "/home/zuul/logs/zuul"
-    host_port 3000, container_port: 3000
     host 'bld-zb-01:4243'
     host 'bld-zb-02:4243'
     host 'bld-zb-03:4243' 
@@ -40,8 +37,6 @@ namespace :environment do
   desc 'Qwest Denver Production environment'
   task :qd => :common do
     set_current_environment(:qd)
-    env_vars LOG_DIR: "/home/zuul/logs/zuul"
-    host_port 3000, container_port: 3000
     host 'qd-zb-01:4243'
     host 'qd-zb-02:4243'
     host 'qd-zb-03:4243'
@@ -50,18 +45,22 @@ namespace :environment do
 end
 ```
 
-This sets up a bld and qd environment and defines a `common` task
-that will be run in either case. Note the dependency call in the task
-definition for the `qd` and `bld` tasks.  Additionally, it
-defines some host ports to map and sets which servers to deploy to. Some
-configuration will provided to the containers at startup time, in the form of
-environment variables.
+#### Common Task
+The common task is used to DRY up your descriptor file. It will always be loaded first allowing you to specify common elements of your deployment here and not repeat them throughout the rest of the file. You could also specify common elements here and then override them in later tasks if you need.
 
-All of the DSL items (`host_port`, `host_volume`, `env_vars`, `host`) can be
-specified more than once and will append to the configuration.
+#### Tasks
+Each task should represent a logical unit of seperation from the rest. For instance, in the above descriptor we are describing each of the environments where the `zuulboy` project can reside. 
 
-#### DSL
-##### host_port
+#### Armada DSL
+Armada provides a few convenience methods for adding items such as host and environment variables to a list.
+
+##### host_port - Exposing container ports to the host system
+The `host_port` method takes 2 parameters - the `port` on the host system and a map of options. The map of options has 3 values that can be set -
+* `host_ip` - The ip address of the host interface. This way you can bind your host port to a particular ip address. Default is `0.0.0.0`
+* `container_port` - The exposed port you are trying to map
+* `type` - The type of port you are exposing. Default is `tcp`.
+
+
 ##### host_volume
 ##### env_vars
 ##### host
