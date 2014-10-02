@@ -57,7 +57,7 @@ Armada provides a few convenience methods for adding items such as host and envi
 #### host_port - Exposing container ports to the host system
 The `host_port` method takes 2 parameters - the `port` on the host system and a map of options. The map of options has 3 values that can be set -
 * `host_ip` - The ip address of the host interface. This way you can bind your host port to a particular ip address. Default is `0.0.0.0`
-* `container_port` - The exposed port you are trying to map
+* `container_port` - The exposed port you are trying to map. **REQUIRED**
 * `type` - The type of port you are exposing. Default is `tcp`.
 
 **You can call this method multiple times to specify multiple exposed ports.**  
@@ -90,9 +90,44 @@ host_volume '/var/log', container_volume: '/var/log:ro'
 ```
 
 #### env_vars - Key value pairs that are passed in as environment variables
-The `env_vars` method take 1 parameter - a map of key value pairs. This 
+The `env_vars` method take 1 parameter - a map of key value pairs.
 
-#### host
+Examples:
+```ruby
+env_vars JAVA_OPTS: '-Xmx2g -server -XX:+UseConcMarkSweepGC'
+```
+
+**You can call this method multiple times to specify multiple environmnet variables*
+
+#### host - Specifies a host for a given task to interact with
+The `host` method takes 1 parameter which is a string containing the `host` and `port` of the docker api you would like to interact with.
+
+Examples:
+```ruby
+host 'bld-docker-01:4243'
+```
+
+**You can call this method multiple times to specify multiple hosts**
+
+#### container_name - Override the container name
+The `container_name` method takes 1 parameter which is a string to name the container when it is created on the host. Currently this is how we identify which container to shutdown during a rolling deploy.
+
+Examples:
+```ruby
+container_name 'zuul'
+```
+
+#### setting other descriptor values
+Some configuration options are not set using a DSL method. Instead you must call the `set` method. The current list of these options are:
+
+```ruby
+set :image, 'quay.io/rallysoftware/bag-boy'
+set :tag, '0.1.0'
+set :health_check_endpoint, '/_metrics/healthcheck'
+set :health_check_port, 3100
+set :deploy_retries, 60 #number of times to check if the container is up and healthy
+set :deploy_wait_time, 1 #number of seconds to wait between each retry
+```
 
 ### Deploying
 
