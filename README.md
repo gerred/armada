@@ -19,11 +19,12 @@ would go into `config/armada/zuulboy.rake`:
 ```ruby
 namespace :environment do
   task :common do
-    env_vars LOG_DIR: "/home/zuul/logs/zuul"
-    host_port 3000, container_port: 3000
+    env_vars LOG_DIR: '/home/zuul/logs/zuul'
+    container_name 'zuul'
     set :image, 'quay.io/rallysoftware/zuul'
     set :health_check_endpoint, '/metrics/healthcheck'
     set :health_check_port, 3000
+    host_port 3000, container_port: 3000
   end
 
   desc 'Boulder environment'
@@ -92,7 +93,7 @@ env_vars JAVA_OPTS: '-Xmx2g -server -XX:+UseConcMarkSweepGC'
 env_vars DB_USER: 'someuser'
 ```
 
-**You can call this method multiple times to specify multiple environmnet variables*
+**You can call this method multiple times to specify multiple environment variables**
 
 #### host - Specifies a host for a given task to interact with
 The `host` method takes 1 parameter which is a string containing the `host` and `port` of the docker api you would like to interact with.
