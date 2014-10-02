@@ -167,7 +167,7 @@ armada deploy rolling <project> <environment> <options>
 ```
 
 Steps performed by this task:
- 1. Pull the version of the image you wish to deploy. If `--no-pull` is specified this will not occur. (This is the only step that occurs in parallel)
+ 1. Pull the version of the image you wish to deploy. If `--no-pull` is specified this will not occur.
  1. Stop all running container(s) with the name you are wishing to use.
  1. Start the new container(s)
  1. Wait for the container(s) to come up
@@ -180,4 +180,9 @@ Options:
 * `tag` - This will override the tag defined in the descriptor
 * `username` - The username for the private registry of your image
 * `password` - The password for the private registry of your image
-* `health-check` - Performs a health check at container startup. If you specify the option without a value it defaults to true. Default is false. 
+* `health-check` - Default is true. You can specify `--no-health-check` to not perform a health check during a rolling deploy.
+
+Examples:
+```bash
+armada deploy rolling foo prod --hosts my-prod-host:5555 --username username --password secretsauce --no-health-check
+```
