@@ -45,25 +45,54 @@ namespace :environment do
 end
 ```
 
-#### Common Task
+### Common Task
 The common task is used to DRY up your descriptor file. It will always be loaded first allowing you to specify common elements of your deployment here and not repeat them throughout the rest of the file. You could also specify common elements here and then override them in later tasks if you need.
 
-#### Tasks
+### Tasks
 Each task should represent a logical unit of seperation from the rest. For instance, in the above descriptor we are describing each of the environments where the `zuulboy` project can reside. 
 
-#### Armada DSL
+### Armada DSL
 Armada provides a few convenience methods for adding items such as host and environment variables to a list.
 
-##### host_port - Exposing container ports to the host system
+#### host_port - Exposing container ports to the host system
 The `host_port` method takes 2 parameters - the `port` on the host system and a map of options. The map of options has 3 values that can be set -
 * `host_ip` - The ip address of the host interface. This way you can bind your host port to a particular ip address. Default is `0.0.0.0`
 * `container_port` - The exposed port you are trying to map
 * `type` - The type of port you are exposing. Default is `tcp`.
 
+**You can call this method multiple times to specify multiple exposed ports.**  
+**If your container exposes a port and you do not want to map it to a static port on the host, Armada will make sure docker dynamically assigns it a port.**
 
-##### host_volume
-##### env_vars
-##### host
+Examples:
+
+```ruby 
+host_port 3000, container_port: 3000
+```
+
+```ruby 
+host_port 3000, container_port: 3000, type: 'udp'
+```
+
+```ruby
+host_port 3000, host_ip: '123.456.789' container_port: 3000, type: 'udp'
+```
+
+#### host_volume - Mapping container volumes to host volumes
+The `host_volume` method takes two parameters - the host volume and a map of options. The map of options has 1 value that can be set.
+* `container_volume` - The container volume to map to.
+
+**You can call this method multiple times to specify multiple volumes**
+
+Examples:
+```ruby
+host_volume '/var/log', container_volume: '/var/log:rw'
+host_volume '/var/log', container_volume: '/var/log:ro'
+```
+
+#### env_vars - Key value pairs that are passed in as environment variables
+The `env_vars` method take 1 parameter - a map of key value pairs. This 
+
+#### host
 
 ### Deploying
 
