@@ -27,8 +27,6 @@ module Armada
       options[:deploy_retries]        = 60       unless options[:deploy_retries]
       options[:deploy_wait_time]      = 1        unless options[:deploy_wait_time]
       options[:health_check_endpoint] = '/'      unless options[:health_check_endpoint]
-
-      ap options
       options
     end
   end
