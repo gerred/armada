@@ -1,16 +1,16 @@
 ## Description
 
-Armada is a docker deployment tool which we originally forked from the [NewRelic Centurion](https://github.com/newrelic/centurion) project. It has since seen a huge refactor occur where we started using the [swipely/docker-api](https://github.com/swipely/docker-api) gem for interacting with our docker hosts instead of the mix of docker-cli and api calls that Centurion makes. The DSL is largely unchanged as it works really well for our intended purposes. 
+Armada is a docker deployment tool which we originally forked from the [NewRelic Centurion](https://github.com/newrelic/centurion) project. It has since seen a huge refactor occur where we started using the [swipely/docker-api](https://github.com/swipely/docker-api) gem for interacting with our docker hosts instead of the mix of docker-cli and api calls that Centurion makes. The DSL is largely unchanged as it works really well for our intended purposes.
 
 ## Installation
 
 ```
-$ gem source -a http://gems.f4tech.com
+$ gem sources -a http://gems.f4tech.com
 $ gem install armada
 ```
 
 ## Writing your service descriptor
-Currently, all descriptors live at [RallySoftware/armada-configs](https://github.com/RallySoftware/armada-configs) in the `config/armada` directory. 
+Currently, all descriptors live at [RallySoftware/armada-configs](https://github.com/RallySoftware/armada-configs) in the `config/armada` directory.
 
 Descriptors are in the form of a Rake task that uses a built-in DSL to make them
 easy to write. Here's a sample config for a project called `zuulboy` that
@@ -32,7 +32,7 @@ namespace :environment do
     set_current_environment(:bld)
     host 'bld-zb-01:4243'
     host 'bld-zb-02:4243'
-    host 'bld-zb-03:4243' 
+    host 'bld-zb-03:4243'
   end
 
   desc 'Qwest Denver Production environment'
@@ -50,7 +50,7 @@ end
 The `common` task is used to DRY up your descriptor file. It will always be loaded first allowing you to specify common elements of your deployment here and not repeat them throughout the rest of the file. You could also specify common elements here and then override them in later tasks if you need.
 
 ### Tasks
-Each task should represent a logical unit of seperation from the rest. For instance, in the above descriptor we are describing each of the environments where the `zuulboy` project can reside. 
+Each task should represent a logical unit of seperation from the rest. For instance, in the above descriptor we are describing each of the environments where the `zuulboy` project can reside.
 
 ### Armada DSL
 Armada provides a few convenience methods for adding items such as host and environment variables to a list.
@@ -61,12 +61,12 @@ The `host_port` method takes 2 parameters - the `port` on the host system and a 
 * `container_port` - The exposed port you are trying to map. **REQUIRED**
 * `type` - The type of port you are exposing. Default is `tcp`.
 
-**You can call this method multiple times to specify multiple exposed ports.**  
+**You can call this method multiple times to specify multiple exposed ports.**
 **If your container exposes a port and you do not want to map it to a static port on the host, Armada will make sure docker dynamically assigns it a port.**
 
 Examples:
 
-```ruby 
+```ruby
 host_port 3000, container_port: 3000
 host_port 8282, container_port: 8080, type: 'udp'
 host_port 5991, host_ip: '123.456.789' container_port: 7001, type: 'udp'
@@ -132,7 +132,7 @@ The CLI is written using [Thor](http://whatisthor.com/). Below is current comman
 The following tasks can be used when deploying a container to a set of docker hosts.
 
 #### Parallel
-Deploys a project to all hosts in parallel. The following steps are run within their own thread. This means that some steps may complete on some hosts faster than other. Also means that all machines will be down at roughly the same time. 
+Deploys a project to all hosts in parallel. The following steps are run within their own thread. This means that some steps may complete on some hosts faster than other. Also means that all machines will be down at roughly the same time.
 
 Command:
 ```bash
@@ -152,7 +152,7 @@ Options:
 * `tag` - This will override the tag defined in the descriptor
 * `username` - The username for the private registry of your image
 * `password` - The password for the private registry of your image
-* `health-check` - Performs a health check at container startup. If you specify the option without a value it defaults to true. Default is false. 
+* `health-check` - Performs a health check at container startup. If you specify the option without a value it defaults to true. Default is false.
 
 Examples:
 ```bash
