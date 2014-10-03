@@ -153,10 +153,12 @@ Options:
 * `username` - The username for the private registry of your image
 * `password` - The password for the private registry of your image
 * `health-check` - Performs a health check at container startup. If you specify the option without a value it defaults to true. Default is false.
+* `env-vars` - This allows for new or overriding env vars to be passed in from the command line. This option can only be specified once, but may take mulitple values.
 
 Examples:
 ```bash
 armada deploy parallel foo prod --hosts my-prod-host:5555 --username username --password secretsauce --health-check
+armada deploy parallel foo prod --env-vars PORT:4343 DB_USER:"FOO"
 ```
 
 #### Rolling
@@ -182,8 +184,10 @@ Options:
 * `username` - The username for the private registry of your image
 * `password` - The password for the private registry of your image
 * `health-check` - Default is true. You can specify `--no-health-check` to not perform a health check during a rolling deploy.
+* `env-vars` - This allows for new or overriding env vars to be passed in from the command line. This option can only be specified once, but may take mulitple values.
 
 Examples:
 ```bash
 armada deploy rolling foo prod --hosts my-prod-host:5555 --username username --password secretsauce --no-health-check
+armada deploy rolling foo prod --env-vars PORT:4343 DB_USER:"FOO"
 ```
