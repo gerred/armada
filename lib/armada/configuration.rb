@@ -20,7 +20,8 @@ module Armada
       task.invoke
 
       task_options = Thor::CoreExt::HashWithIndifferentAccess.new(env[environment.to_sym])
-      env_vars = task_options[:env_vars].merge(cli_options[:env_vars]) # If I try and merge cli_options into task_options it overrides the task_options[:env_vars] hash.
+      env_vars = task_options[:env_vars]  
+      env_vars.merge!(cli_options[:env_vars]) if cli_options[:env_vars] # If I try and merge cli_options into task_options it overrides the task_options[:env_vars] hash.
       options = task_options.merge(cli_options)
       options[:env_vars]              = env_vars
       options[:tag]                   = 'latest' unless options[:tag]
