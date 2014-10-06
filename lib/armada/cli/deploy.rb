@@ -9,6 +9,7 @@ module Armada
     option :password,     :type => :string,  :aliases => :p, :desc => "Docker registry password"
     option :health_check, :type => :boolean, :aliases => :c, :desc => "Perform health check of container", :default => false, :lazy_default => true
     option :env_vars,     :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
+    option :no_pull,      :type => :boolean,                 :desc => "Do not pull the image from the docker registry", :default => false, :lazy_default => true
     def parallel(project, environment)
       @options = Armada::Configuration.load!(project, environment, @options)
       Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')} in PARALLEL"
@@ -34,6 +35,7 @@ module Armada
     option :password,     :type => :string,  :aliases => :p, :desc => "Docker registry password"
     option :health_check, :type => :boolean, :aliases => :c, :desc => "Perform health check of container. Default is true", :default => true
     option :env_vars,     :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
+    option :no_pull,      :type => :boolean,                 :desc => "Do not pull the image from the docker registry", :default => false, :lazy_default => true
     def rolling(project, environment)
       @options = Armada::Configuration.load!(project, environment, @options)
       Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')}"
