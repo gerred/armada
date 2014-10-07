@@ -23,7 +23,7 @@ module Armada
     end
 
     def start
-      info "Creating new container for image - #{@image.name}:#{@image.tag} (#{@image.id}) with name #{@name}"
+      info "Creating new container for image - #{@image.name}:#{@image.tag} with image id (#{@image.id}) with container name #{@name}"
       container_config = Armada::Container.create_container_config(@image.id, @name, @host, @options)
       begin
         @container = create(container_config)

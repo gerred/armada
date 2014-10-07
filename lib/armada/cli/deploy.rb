@@ -14,16 +14,21 @@ module Armada
       @options = Armada::Configuration.load!(project, environment, @options)
       Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')} in PARALLEL"
 
-      hosts = Armada::DockerHost.new(@options[:hosts])
-      hosts.each_in_parallel do |connection|
-        image = Armada::Image.new(@options, connection)
-        image.pull
+      begin
+        hosts = Armada::DockerHost.new(@options[:hosts])
+        hosts.each_in_parallel do |connection|
+          image = Armada::Image.create(@options, connection)
+          image.pull
 
-        container = Armada::Container.new(image, @options, connection)
-        container.stop
-        container.start
-        container.wait_for_container
-        container.health_check if @options[:health_check]
+          container = Armada::Container.new(image, @options, connection)
+          container.stop
+          container.start
+          container.wait_for_container
+          container.health_check if @options[:health_check]
+        end
+      rescue Exception => e
+        error e.message
+        exit(1)
       end
     end
 
@@ -40,18 +45,24 @@ module Armada
       @options = Armada::Configuration.load!(project, environment, @options)
       Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')}"
 
-      hosts = Armada::DockerHost.new(@options[:hosts])
-      hosts.each do |connection|
-        image = Armada::Image.new(@options, connection)
-        image.pull
+      begin
+        hosts = Armada::DockerHost.new(@options[:hosts])
+        hosts.each_in_parallel do |connection|
+          Armada::Image.create(@options, connection).pull
+        end
 
-        container = Armada::Container.new(image, @options, connection)
-        container.stop
-        container.start
-        container.wait_for_container
-        container.health_check if options[:health_check]
+        hosts.each do |connection|
+          image = Armada::Image.create(@options, connection)
+          container = Armada::Container.new(image, @options, connection)
+          container.stop
+          container.start
+          container.wait_for_container
+          container.health_check if options[:health_check]
+        end
+      rescue Exception => e
+        error e.message
+        exit(1)
       end
     end
-
   end
 end
