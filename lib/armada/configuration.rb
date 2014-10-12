@@ -25,8 +25,6 @@ module Armada
       options = task_options.merge(cli_options)
       options[:env_vars]              = env_vars
       options[:tag]                   = 'latest' unless options[:tag]
-      options[:deploy_retries]        = 60       unless options[:deploy_retries]
-      options[:deploy_wait_time]      = 1        unless options[:deploy_wait_time]
       options[:health_check_endpoint] = '/'      unless options[:health_check_endpoint]
       options
     end
