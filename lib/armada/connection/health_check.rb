@@ -33,7 +33,7 @@ module Armada
 
       def healthy?
         response = begin
-          Excon.get("#{health_check_host}:#{health_check_port}#{@endpoint}")
+          Excon.get("http://#{health_check_host}:#{health_check_port}#{@endpoint}")
         rescue Exception => e
           return false
         end
