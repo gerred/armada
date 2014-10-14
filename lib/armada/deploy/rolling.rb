@@ -34,7 +34,8 @@ module Armada
             end
           end
         rescue Exception => e
-          raise e.message
+          Armada.ui.error "#{e.message} \n\n #{e.backtrace.join("\n")}"
+          exit(1)
         end
       end
     end
