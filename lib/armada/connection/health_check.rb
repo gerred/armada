@@ -21,14 +21,12 @@ module Armada
           unless healthy?
             info "Still waiting for health check to pass at - :#{@port}#{@endpoint} endpoint..." if i % (@retries/10) == 0
             sleep(@delay)
+          else
+            info "Health check succeeded!"
+            return true
           end
         end
-
-        unless healthy?
-          raise "Failed to validate health check on #{self}"
-        else
-          info "Health Check succeeded!"
-        end
+        return false
       end
 
       def healthy?

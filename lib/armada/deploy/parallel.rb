@@ -21,12 +21,16 @@ module Armada
             container = Armada::Container.new(image, @options, docker_connection)
             container.stop
             container.start
-            Armada::Connection::HealthCheck.new(host, @options[:health_check_port],
-                                                      @options[:health_check_endpoint],
-                                                      @options[:health_check_delay],
-                                                      @options[:health_check_retries],
-                                                      @options[:ssh_gateway],
-                                                      @options[:ssh_gateway_user]).run if @options[:health_check]
+
+
+            if @options[:health_check]
+              raise "Health check failed! - #{host}" unless Armada::Connection::HealthCheck.new(host, @options[:health_check_port],
+                                                                                                      @options[:health_check_endpoint],
+                                                                                                      @options[:health_check_delay],
+                                                                                                      @options[:health_check_retries],
+                                                                                                      @options[:ssh_gateway],
+                                                                                                      @options[:ssh_gateway_user]).run
+            end
           end
         rescue Exception => e
           Armada.ui.error "#{e.message} \n\n #{e.backtrace.join("\n")}"
