@@ -10,29 +10,11 @@ describe Armada::Image do
     :tag            => tag,
     :no_pull        => no_pull
   }}
-  let(:connection) { Docker::Connection.new("http://foo-01", {}) }
-  let(:armada_image) { Armada::Image.new(options, connection) }
-  let(:docker_image) { Docker::Image.new(connection, "id" => image_id) }
 
-  let(:someimage_history) {
-    {
-          "Created" => 1411767440,
-        "CreatedBy" => "/bin/sh -c #(nop) CMD [./start-bagboy.sh]",
-               "Id" => "123456789abc123",
-             "Size" => 0,
-             "Tags" => ["quay.io/someorg/someimage:latest"]
-    }
-  }
-  let(:fooimage_history) {
-    {
-          "Created" => 1411767439,
-        "CreatedBy" => "/bin/sh -c #(nop) EXPOSE map[3110/tcp:{}]",
-               "Id" => "not-123456789abc123",
-             "Size" => 0,
-             "Tags" => nil
-    }
-  }
-  let(:history) {[someimage_history, fooimage_history]}
+  let(:connection) { Armada::Connection::Docker.new("foo-01:4243") }
+  let(:docker_connection) { ::Docker::Connection.new("http://foo-01", {}) }
+  let(:armada_image) { Armada::Image.new(options, connection) }
+  let(:docker_image) { ::Docker::Image.new(docker_connection, "id" => image_id) }
 
   describe "#pull" do
     context "when no_pull is true" do
@@ -55,24 +37,11 @@ describe Armada::Image do
 
     context "when no_pull is false" do
       it "should call Docker::Image.create" do
-        expect(Docker::Image).to receive(:create).and_return(docker_image)
+        expect(::Docker::Image).to receive(:create).and_return(docker_image)
         armada_image.pull
       end
     end
   end
 
-  describe "#first_by_tag" do
-    context "when history and tag are given" do
-      it { Armada::Image.first_by_tag(history, "#{image_name}:#{tag}").should be(someimage_history) }
-    end
-
-    context "when tag does not exist" do
-      it { expect { Armada::Image.first_by_tag(history, "#{image_name}:someothertag") }.to raise_error }
-    end
-
-    context "when the tag is nil" do
-      it { expect { Armada::Image.first_by_tag(history, nil) }.to raise_error(/Image tag/) }
-    end
-  end
 
 end

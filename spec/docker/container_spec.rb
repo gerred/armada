@@ -12,10 +12,11 @@ describe Armada::Container do
     :tag            => tag
   }}
 
-  let(:connection) { Docker::Connection.new("http://foo-01", {}) }
+  let(:connection) { Armada::Connection::Docker.new("foo-01:4243") }
+  let(:docker_connection) { ::Docker::Connection.new("http://foo-01:4243", {})}
   let(:armada_image) { Armada::Image.new(options, connection) }
-  let(:docker_image) { Docker::Image.new(connection, "id" => image_id) }
-  let(:docker_container) { Docker::Container.send(:new, connection, {'id' => container_id, 'Names' => ["/#{container_name}"]}) }
+  let(:docker_image) { ::Docker::Image.new(docker_connection, "id" => image_id) }
+  let(:docker_container) { ::Docker::Container.send(:new, docker_connection, {'id' => container_id, 'Names' => ["/#{container_name}"]}) }
   let(:armada_container) { Armada::Container.new(armada_image, options, connection) }
   let(:config) {{
     :port_bindings => { "1111/tcp" => [{"HostIp" => "0.0.0.0", "HostPort" => "1111"}],
@@ -26,7 +27,7 @@ describe Armada::Container do
 
   describe "#stop" do
     context "when the container exists" do
-      before { Armada::Container.should_receive(:find_by_name).and_return(docker_container) }
+      before { Armada::Container.should_receive(:get).and_return(docker_container) }
       it "should call kill and remove" do
         expect(armada_container).to receive(:kill)
         expect(armada_container).to receive(:remove)
@@ -35,7 +36,7 @@ describe Armada::Container do
     end
 
     context "when the container does not exist" do
-      before { Armada::Container.should_receive(:find_by_name).and_return(nil) }
+      before { Armada::Container.should_receive(:get).and_return(nil) }
       it "should not call kill and remove" do
         expect(armada_container).not_to receive(:kill)
         expect(armada_container).not_to receive(:remove)
@@ -47,7 +48,7 @@ describe Armada::Container do
 
   describe "#kill" do
     context "when the container exists" do
-      before { Armada::Container.should_receive(:find_by_name).and_return(docker_container) }
+      before { Armada::Container.should_receive(:get).and_return(docker_container) }
       it "should call kill on the container" do
         expect(armada_container.container).to receive(:kill)
         armada_container.kill
@@ -60,7 +61,7 @@ describe Armada::Container do
     end
 
     context "when the container does not exist" do
-      before { Armada::Container.should_receive(:find_by_name).and_return(nil) }
+      before { Armada::Container.should_receive(:get).and_return(nil) }
       it "should not call kill" do
         allow_message_expectations_on_nil
         expect(armada_container.container).not_to receive(:kill)
@@ -71,7 +72,7 @@ describe Armada::Container do
 
   describe "#remove" do
     context "when the container exists" do
-      before { Armada::Container.should_receive(:find_by_name).and_return(docker_container) }
+      before { Armada::Container.should_receive(:get).and_return(docker_container) }
       it "should call remove on the container" do
         expect(armada_container.container).to receive(:remove)
         armada_container.remove
@@ -90,54 +91,12 @@ describe Armada::Container do
     end
 
     context "when the container does not exist" do
-      before { Armada::Container.should_receive(:find_by_name).and_return(nil) }
+      before { Armada::Container.should_receive(:get).and_return(nil) }
       it "should not call remove" do
         allow_message_expectations_on_nil
         expect(armada_container.container).not_to receive(:remove)
         armada_container.remove
       end
-    end
-  end
-
-  describe "#create" do
-    before { Armada::Container.should_receive(:find_by_name).and_return(nil) }
-    it "should call create on Docker::Container" do
-      expect(Docker::Container).to receive(:create).with({}, connection)
-      armada_container.create({})
-    end
-  end
-
-  describe "#container_up?" do
-    context "when the container has a StartedAt entry" do
-      it "should return true" do
-        Armada::Container.should_receive(:find_by_name).and_return(docker_container)
-        docker_container.should_receive(:json).and_return({"State" => { "StartedAt" => Time.now.to_s }})
-        armada_container.container_up?.should be_true
-      end
-    end
-
-
-    context "when the container has no StartedAt entry" do
-      it "should return false" do
-        Armada::Container.should_receive(:find_by_name).and_return(nil)
-        armada_container.container_up?.should be_false
-      end
-    end
-  end
-
-  describe ".find_by_name" do
-    let(:foo_container) { Docker::Container.send(:new, connection, {'id' => container_id, 'Names' => ["/foo_container"]}) }
-    let(:bar_container) { Docker::Container.send(:new, connection, {'id' => container_id, 'Names' => ["/bar_container"]}) }
-    let(:baz_container) { Docker::Container.send(:new, connection, {'id' => container_id, 'Names' => ["/baz_container"]}) }
-
-    it "should find matching container by name excluding the leading slash" do
-      Armada::Container.should_receive(:all).and_return([foo_container, bar_container, baz_container, docker_container])
-      Armada::Container.find_by_name(container_name, connection).info["Names"].should include("/#{container_name}")
-    end
-
-    it "should return nil if no matching container is found" do
-      Armada::Container.should_receive(:all).and_return([foo_container, bar_container, baz_container])
-      Armada::Container.find_by_name(container_name, connection).should be_nil
     end
   end
 
@@ -159,34 +118,5 @@ describe Armada::Container do
                                     "2222/udp" => [{"HostIp" => "0.0.0.0", "HostPort" => "2222"}]}) }
     it { should include("PublishAllPorts" => true) }
   end
-
-  describe ".healthy?" do
-    context "when the container health check passes" do
-      let(:mock_ok_status)  { double('http_status_ok').tap { |s| s.stub(status: 200) } }
-      before { expect(Excon).to receive(:get).with(any_args).and_return(mock_ok_status) }
-
-      it "should return true" do
-        Armada::Container.healthy?("foo-01", "/metrics/healthcheck", 2181).should be_true
-      end
-    end
-
-    context "when the container health check fails" do
-      let(:mock_bad_status)  { double('http_status_ok').tap { |s| s.stub(status: 500) } }
-      before { expect(Excon).to receive(:get).with(any_args).and_return(mock_bad_status) }
-
-      it "should return false" do
-        Armada::Container.healthy?("foo-01", "/metrics/healthcheck", 2181).should be_false
-      end
-    end
-
-    context "when the container health check throws an error" do
-      before { expect(Excon).to receive(:get).with(any_args).and_raise(Excon::Errors::SocketError.new(RuntimeError.new())) }
-
-      it "should return false" do
-        Armada::Container.healthy?("foo-01", "/metrics/healthcheck", 2181).should be_false
-      end
-    end
-  end
-
 
 end

@@ -16,8 +16,10 @@ module Armada
       end
 
       def initialize_gateway!
-        @gateway       = Net::SSH::Gateway.new(@gateway_host, @gateway_user)
-        @tunneled_port = @gateway.open(@host, @port)
+        if @gateway_host
+          @gateway       = Net::SSH::Gateway.new(@gateway_host, @gateway_user)
+          @tunneled_port = @gateway.open(@host, @port)
+        end
       end
     end
   end

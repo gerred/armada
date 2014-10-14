@@ -31,6 +31,20 @@ module Armada
         end
       end
 
+      def healthy?
+        response = begin
+          Excon.get("#{health_check_host}:#{health_check_port}#{@endpoint}")
+        rescue Exception => e
+          return false
+        end
+
+        return false unless response
+        return true if response.status >= 200 && response.status < 300
+
+        warn "Got HTTP status: #{response.status}"
+        false
+      end
+
       private
 
       def health_check_host
@@ -40,23 +54,6 @@ module Armada
 
       def health_check_port
         return @tunneled_port ||= port
-      end
-
-      def healthy?
-        response = begin
-          http = Net::HTTP.new(health_check_host, health_check_port)
-          http.read_timeout = 1
-          request = Net::HTTP::Get.new(@endpoint)
-          http.request(request)
-        rescue Exception => e
-          return false
-        end
-
-        return false unless response
-        return true if response.code.to_i >= 200 && response.code.to_i < 300
-
-        warn "Got HTTP status: #{response.status}"
-        false
       end
 
       def info(message)

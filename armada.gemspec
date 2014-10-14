@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 2.14.0'
   spec.add_development_dependency 'thor-scmversion', '< 1.6.0'
   spec.add_development_dependency 'geminabox', '~> 0.10'
+  spec.add_development_dependency 'webmock'
 
   spec.required_ruby_version = '>= 1.9.3'
 end
