@@ -14,7 +14,7 @@ module Armada
 
         begin
           @options[:hosts].each_in_parallel do |host|
-            docker_connection = Armada::Connection::Docker.new(host, gateway, @options[:ssh_gateway], @options[:ssh_gateway_user])
+            docker_connection = Armada::Connection::Docker.new(host, @options[:ssh_gateway], @options[:ssh_gateway_user])
             image = Armada::Image.create(@options, docker_connection)
             image.pull
 
