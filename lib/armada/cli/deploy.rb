@@ -1,68 +1,34 @@
 module Armada
-  class Deploy < Thor
+  class DeployCli < Thor
 
     desc "parallel <project> <environment>", "Deploy the specified project to a set of hosts in parallel."
-    option :hosts,        :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
-    option :image,        :type => :string,  :aliases => :i, :desc => "The image to use when deploying"
-    option :tag,          :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
-    option :username,     :type => :string,  :aliases => :u, :desc => "Docker registry username"
-    option :password,     :type => :string,  :aliases => :p, :desc => "Docker registry password"
-    option :health_check, :type => :boolean, :aliases => :c, :desc => "Perform health check of container", :default => false, :lazy_default => true
-    option :env_vars,     :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
-    option :no_pull,      :type => :boolean,                 :desc => "Do not pull the image from the docker registry", :default => false, :lazy_default => true
+    option :hosts,            :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
+    option :image,            :type => :string,  :aliases => :i, :desc => "The image to use when deploying"
+    option :tag,              :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
+    option :username,         :type => :string,  :aliases => :u, :desc => "Docker registry username"
+    option :password,         :type => :string,  :aliases => :p, :desc => "Docker registry password"
+    option :health_check,     :type => :boolean, :aliases => :c, :desc => "Perform health check of container", :default => false, :lazy_default => true
+    option :env_vars,         :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
+    option :pull,             :type => :boolean,                 :desc => "Whether to pull the image from the docker registry", :default => true
+    option :ssh_gateway,      :type => :string,  :aliases => :G, :desc => "SSH Gateway Host"
+    option :ssh_gateway_user, :type => :string,  :aliases => :U, :desc => "SSH Gateway User"
     def parallel(project, environment)
-      @options = Armada::Configuration.load!(project, environment, @options)
-      Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')} in PARALLEL"
-
-      begin
-        hosts = Armada::DockerHost.new(@options[:hosts])
-        hosts.each_in_parallel do |connection|
-          image = Armada::Image.create(@options, connection)
-          image.pull
-
-          container = Armada::Container.new(image, @options, connection)
-          container.stop
-          container.start
-          container.wait_for_container
-          container.health_check if @options[:health_check]
-        end
-      rescue Exception => e
-        error e.message
-        exit(1)
-      end
+      Armada::Deploy::Parallel.new(project, environment, options).run
     end
 
     desc "rolling <project> <environment>", "Perform a rolling deploy across a set of hosts."
-    option :hosts,        :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
-    option :image,        :type => :string,  :aliases => :i, :desc => "The image to use when deploying"
-    option :tag,          :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
-    option :username,     :type => :string,  :aliases => :u, :desc => "Docker registry username"
-    option :password,     :type => :string,  :aliases => :p, :desc => "Docker registry password"
-    option :health_check, :type => :boolean, :aliases => :c, :desc => "Perform health check of container. Default is true", :default => true
-    option :env_vars,     :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
-    option :no_pull,      :type => :boolean,                 :desc => "Do not pull the image from the docker registry", :default => false, :lazy_default => true
+    option :hosts,            :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
+    option :image,            :type => :string,  :aliases => :i, :desc => "The image to use when deploying"
+    option :tag,              :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
+    option :username,         :type => :string,  :aliases => :u, :desc => "Docker registry username"
+    option :password,         :type => :string,  :aliases => :p, :desc => "Docker registry password"
+    option :health_check,     :type => :boolean, :aliases => :c, :desc => "Perform health check of container. Default is true", :default => true
+    option :env_vars,         :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
+    option :pull,             :type => :boolean,                 :desc => "Whether to pull the image from the docker registry", :default => true
+    option :ssh_gateway,      :type => :string,  :aliases => :G, :desc => "SSH Gateway Host"
+    option :ssh_gateway_user, :type => :string,  :aliases => :U, :desc => "SSH Gateway User"
     def rolling(project, environment)
-      @options = Armada::Configuration.load!(project, environment, @options)
-      Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')}"
-
-      begin
-        hosts = Armada::DockerHost.new(@options[:hosts])
-        hosts.each_in_parallel do |connection|
-          Armada::Image.create(@options, connection).pull
-        end
-
-        hosts.each do |connection|
-          image = Armada::Image.create(@options, connection)
-          container = Armada::Container.new(image, @options, connection)
-          container.stop
-          container.start
-          container.wait_for_container
-          container.health_check if options[:health_check]
-        end
-      rescue Exception => e
-        error e.message
-        exit(1)
-      end
+      Armada::Deploy::Rolling.new(project, environment, options).run
     end
   end
 end

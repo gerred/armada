@@ -27,9 +27,9 @@ module Armada
 
 
     desc "deploy SUBCOMMAND ...ARGS", "Deploy a docker container"
-    subcommand "deploy", Armada::Deploy
+    subcommand "deploy", Armada::DeployCli
 
     desc "inspect SUBCOMMAND ...ARGS", "Info about the state of a docker host"
-    subcommand "inspect", Armada::Inspect
+    subcommand "inspect", Armada::InspectCli
   end
 end

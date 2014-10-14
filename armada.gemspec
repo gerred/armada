@@ -18,6 +18,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'excon', '~> 0.33'
+  spec.add_dependency 'net-ssh'
+  spec.add_dependency 'net-ssh-gateway'
   spec.add_dependency 'docker-api', '~> 1.13'
   spec.add_dependency 'thor', '~> 0.19'
   spec.add_dependency 'awesome_print'
