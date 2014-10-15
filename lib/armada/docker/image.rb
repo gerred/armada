@@ -26,9 +26,13 @@ module Armada
 
     def pull
       if @pull
-        info "Pulling image [#{@name}] with tag [#{@tag}]"
-        @image = ::Docker::Image.create({:fromImage => @name, :tag => @tag}, @auth, @docker_connection.connection)
-        @id = @image.id
+        begin
+          info "Pulling image [#{@name}] with tag [#{@tag}]"
+          @image = ::Docker::Image.create({:fromImage => @name, :tag => @tag}, @auth, @docker_connection.connection)
+          @id = @image.id
+        rescue Exception => e
+          warn "An error occurred while trying to pull image [#{@name}] with tag [#{@tag}] -- #{e.message}"
+        end
       else
         info "Not pulling image [#{@name}] with tag [#{@tag}] because `--no-pull` was specified."
         raise "The image id is not set, you cannot proceed with the deploy until a valid image is found -- [#{@name}:#{@tag}]" unless valid?

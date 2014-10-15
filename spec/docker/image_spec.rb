@@ -4,7 +4,7 @@ describe Armada::Image do
   let(:image_id) { "123456789abc123" }
   let(:image_name) { "quay.io/someorg/someimage" }
   let(:tag) { "latest" }
-  let(:pull) { false }
+  let(:pull) { true }
   let(:options) {{
     :image => image_name,
     :tag   => tag,
@@ -17,8 +17,8 @@ describe Armada::Image do
   let(:docker_image) { ::Docker::Image.new(docker_connection, "id" => image_id) }
 
   describe "#pull" do
-    context "when no_pull is true" do
-      let(:pull) { true }
+    context "when pull is false" do
+      let(:pull) { false }
 
       it "should not call Docker::Image.create" do
         options.merge!({
@@ -35,7 +35,7 @@ describe Armada::Image do
       it { expect { armada_image.pull }.to raise_error }
     end
 
-    context "when no_pull is false" do
+    context "when pull is true" do
       it "should call Docker::Image.create" do
         expect(::Docker::Image).to receive(:create).and_return(docker_image)
         armada_image.pull
