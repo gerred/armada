@@ -51,6 +51,10 @@ module Armada
       Armada.ui.info "#{@docker_connection.host} -- #{message}"
     end
 
+    def warn(message)
+      Armada.ui.warn "#{@docker_connection.host} -- #{message}"
+    end
+
     def error(message)
       Armada.ui.error "#{@docker_connection.host} -- #{message}"
     end
