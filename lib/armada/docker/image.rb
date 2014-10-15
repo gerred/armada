@@ -7,10 +7,21 @@ module Armada
       @name              = options[:image]
       @tag               = options[:tag]
       @pull              = options[:pull]
-      @auth              = Armada::Image.auth(options[:username], options[:password], options[:email])
       @docker_connection = docker_connection
       @image             = options[:docker_image]
       @id                = @image.id if @image
+  
+      if options[:dockercfg]
+        dockercfg = options[:dockercfg].for_url docker_connection.connection.url
+      else
+        dockercfg = {}
+      end
+
+      username = options.fetch(:username, dockercfg[:username])
+      password = options.fetch(:password, dockercfg[:auth])
+      email =    options.fetch(:email,    dockercfg[:email])
+
+      @auth              = Armada::Image.auth(username, password, email)
     end
 
     def self.create(options, docker_connection)
@@ -58,7 +69,6 @@ module Armada
     def error(message)
       Armada.ui.error "#{@docker_connection.host} -- #{message}"
     end
-
   end
 end
 

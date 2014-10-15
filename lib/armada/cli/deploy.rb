@@ -13,6 +13,7 @@ module Armada
         option :pull,             :type => :boolean,                 :desc => "Whether to pull the image from the docker registry", :default => true
         option :ssh_gateway,      :type => :string,  :aliases => :G, :desc => "SSH Gateway Host"
         option :ssh_gateway_user, :type => :string,  :aliases => :U, :desc => "SSH Gateway User"
+        option :dockercfg,        :type => :string,                  :desc => "dockercfg file to use for authenticating", :default => '~/.dockercfg'
       end
     }
 
