@@ -6,7 +6,7 @@ module Armada
     def initialize(options, docker_connection)
       @name              = options[:image]
       @tag               = options[:tag]
-      @no_pull           = options[:no_pull]
+      @pull              = options[:pull]
       @auth              = Armada::Image.auth(options[:username], options[:password], options[:email])
       @docker_connection = docker_connection
       @image             = options[:docker_image]
@@ -25,7 +25,7 @@ module Armada
     end
 
     def pull
-      unless @no_pull
+      if @pull
         info "Pulling image [#{@name}] with tag [#{@tag}]"
         @image = ::Docker::Image.create({:fromImage => @name, :tag => @tag}, @auth, @docker_connection.connection)
         @id = @image.id

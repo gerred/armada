@@ -59,7 +59,11 @@ module Armada
     end
 
     def self.get(id, connection)
-      ::Docker::Container.get(id, {}, connection)
+      begin
+        return ::Docker::Container.get(id, {}, connection)
+      rescue Exception => e
+        return nil
+      end
     end
 
     def self.create_host_config(options)
