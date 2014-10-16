@@ -8,7 +8,7 @@ module Armada
         @configs = configs
       end
 
-      def for_url(url)
+      def for_image(url)
         @configs.each do |config|
           # debate starts_with? vs ==
           return config if url.start_with? config.url

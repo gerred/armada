@@ -46,7 +46,7 @@ module Armada
 
     def generate_auth(options)
       if options[:dockercfg]
-        dockercfg = options[:dockercfg].for_url @name
+        dockercfg = options[:dockercfg].for_image @name
       else
         dockercfg = Armada::Docker::Config.dummy
       end
