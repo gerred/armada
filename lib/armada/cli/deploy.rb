@@ -6,14 +6,14 @@ module Armada
         option :hosts,            :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
         option :image,            :type => :string,  :aliases => :i, :desc => "The image to use when deploying"
         option :tag,              :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
-        option :username,         :type => :string,  :aliases => :u, :desc => "Docker registry username"
-        option :password,         :type => :string,  :aliases => :p, :desc => "Docker registry password"
+        option :username,         :type => :string,  :aliases => :u, :desc => "Docker registry username, overrides username from --dockercfg"
+        option :password,         :type => :string,  :aliases => :p, :desc => "Docker registry password, overrides password from --dockercfg"
         option :health_check,     :type => :boolean, :aliases => :c, :desc => "Perform health check of container. Default is true", :default => true
         option :env_vars,         :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
         option :pull,             :type => :boolean,                 :desc => "Whether to pull the image from the docker registry", :default => true
         option :ssh_gateway,      :type => :string,  :aliases => :G, :desc => "SSH Gateway Host"
         option :ssh_gateway_user, :type => :string,  :aliases => :U, :desc => "SSH Gateway User"
-        option :dockercfg,        :type => :string,                  :desc => "dockercfg file to use for authenticating", :default => '~/.dockercfg'
+        option :dockercfg,        :type => :string,                  :desc => "Path to dockercfg file, used to authenticate against the docker registry", :default => '~/.dockercfg'
       end
     }
 

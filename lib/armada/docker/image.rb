@@ -10,8 +10,8 @@ module Armada
       @docker_connection = docker_connection
       @image             = options[:docker_image]
       @id                = @image.id if @image
-  
-      @auth              = Armada::Image.auth(options)
+
+      @auth              = generate_auth(options)
     end
 
     def self.create(options, docker_connection)
@@ -44,9 +44,9 @@ module Armada
       ::Docker::Image.get(id, {}, connection)
     end
 
-    def self.auth(options)
+    def generate_auth(options)
       if options[:dockercfg]
-        dockercfg = options[:dockercfg].for_url docker_connection.connection.url
+        dockercfg = options[:dockercfg].for_url @name
       else
         dockercfg = Armada::Docker::Config.dummy
       end

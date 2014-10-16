@@ -10,7 +10,7 @@ module Armada
 
       def for_url(url)
         @configs.each do |config|
-          # debate starts_with? vs == 
+          # debate starts_with? vs ==
           return config if url.start_with? config.url
         end
       end
@@ -22,7 +22,7 @@ module Armada
         if File.readable? abs_path
           json_hash = JSON.parse(IO.read(abs_path))
           json_hash.each do |url, obj|
-            configs.append Config.parse(url, obj)
+            configs.push Config.parse(url, obj)
           end
         end
 
@@ -40,8 +40,8 @@ module Armada
       end
 
       def self.parse(url, obj)
-        username, password = Base64.decode(obj.auth).split(':', 2)
-        return self.new url, username, password, obj.email
+        username, password = Base64.decode64(obj["auth"]).split(':', 2)
+        return self.new url, username, password, obj["email"]
       end
 
       def self.dummy()
