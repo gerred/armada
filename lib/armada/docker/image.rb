@@ -11,17 +11,7 @@ module Armada
       @image             = options[:docker_image]
       @id                = @image.id if @image
   
-      if options[:dockercfg]
-        dockercfg = options[:dockercfg].for_url docker_connection.connection.url
-      else
-        dockercfg = {}
-      end
-
-      username = options.fetch(:username, dockercfg[:username])
-      password = options.fetch(:password, dockercfg[:auth])
-      email =    options.fetch(:email,    dockercfg[:email])
-
-      @auth              = Armada::Image.auth(username, password, email)
+      @auth              = Armada::Image.auth(options)
     end
 
     def self.create(options, docker_connection)
@@ -54,7 +44,17 @@ module Armada
       ::Docker::Image.get(id, {}, connection)
     end
 
-    def self.auth(username, password, email = "")
+    def self.auth(options)
+      if options[:dockercfg]
+        dockercfg = options[:dockercfg].for_url docker_connection.connection.url
+      else
+        dockercfg = Armada::Docker::Config.dummy
+      end
+
+      username = options.fetch(:username, dockercfg.username)
+      password = options.fetch(:password, dockercfg.password)
+      email    = options.fetch(:email,    dockercfg.email)
+
       return { :username => username, :password => password, :email => email } if username && password
     end
 
