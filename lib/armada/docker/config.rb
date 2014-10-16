@@ -13,6 +13,8 @@ module Armada
           # debate starts_with? vs ==
           return config if url.start_with? config.url
         end
+
+        return nil
       end
 
       def self.load(path)
