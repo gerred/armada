@@ -48,7 +48,7 @@ module Armada
       if options[:dockercfg]
         dockercfg = options[:dockercfg].for_image @name
       else
-        dockercfg = Armada::Docker::Config.dummy
+        dockercfg = Armada::Docker::Credentials.dummy
       end
 
       username = options.fetch(:username, dockercfg.username)

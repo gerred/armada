@@ -26,7 +26,7 @@ module Armada
       options[:env_vars]              = env_vars
       options[:tag]                   = 'latest' unless options[:tag]
       options[:health_check_endpoint] = '/'      unless options[:health_check_endpoint]
-      options[:dockercfg]             = Armada::Docker::Configs.load options[:dockercfg]
+      options[:dockercfg]             = Armada::Docker::Config.load options[:dockercfg]
       options
     end
   end

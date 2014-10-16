@@ -2,7 +2,7 @@ require 'base64'
 
 module Armada
   module Docker
-    class Configs
+    class Config
       attr_reader :configs
       def initialize(configs)
         @configs = configs
@@ -22,15 +22,15 @@ module Armada
         if File.readable? abs_path
           json_hash = JSON.parse(IO.read(abs_path))
           json_hash.each do |url, obj|
-            configs.push Config.parse(url, obj)
+            configs.push Credentials.parse(url, obj)
           end
         end
 
-        Configs.new configs
+        Config.new configs
       end
     end
 
-    class Config
+    class Credentials
       attr_reader :url, :username, :password, :email
       def initialize(url, username, password, email)
         @username = username
