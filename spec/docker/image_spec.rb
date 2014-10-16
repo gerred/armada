@@ -5,6 +5,12 @@ describe Armada::Image do
   let(:image_name) { "quay.io/someorg/someimage" }
   let(:tag) { "latest" }
   let(:pull) { true }
+  let(:credentials) {
+    Armada::Docker::Credentials.new image_name, 'username', 'password', 'email'
+  }
+  let(:dockercfg) {
+    Armada::Docker::Config.new [credentials]
+  }
   let(:options) {{
     :image => image_name,
     :tag   => tag,
@@ -43,5 +49,62 @@ describe Armada::Image do
     end
   end
 
+  describe '#generate_auth' do
+    context 'with auth and dockercfg' do
+      let(:my_options) {
+        options.merge({
+          username: 'foobar',
+          password: 'herpderp',
+          dockercfg: dockercfg
+        })
+      }
 
+      let (:image) { Armada::Image.new(my_options, connection) }
+
+      it "should use username and password from options" do
+        expect(image.auth[:username]).to be(my_options[:username])
+        expect(image.auth[:password]).to be(my_options[:password])
+      end
+    end
+
+    context 'with no auth and dockercfg' do
+      let(:my_options) {
+        options.merge({
+          dockercfg: dockercfg
+        })
+      }
+
+      let (:image) { Armada::Image.new(my_options, connection) }
+
+      it "should use username and password from dockercfg" do
+        expect(image.auth).not_to be_nil
+        expect(image.auth[:username]).to be(credentials.username)
+        expect(image.auth[:password]).to be(credentials.password)
+      end
+    end
+
+    context 'with auth and no dockercfg' do
+      let(:my_options) {
+        options.merge({
+          username: 'foobar',
+          password: 'herpderp'
+        })
+      }
+
+      let (:image) { Armada::Image.new(my_options, connection) }
+
+      it "should use username and password from options" do
+        expect(image.auth[:username]).to be(my_options[:username])
+        expect(image.auth[:password]).to be(my_options[:password])
+      end
+    end
+
+    context 'with no auth and no dockercfg' do
+      let (:image) { Armada::Image.new(options, connection)}
+
+      it "should use username and password from options" do
+        expect(image.auth).to be_nil
+      end
+    end
+  end
 end

@@ -1,16 +1,17 @@
 module Armada
   class Image
 
-    attr_reader :id, :image, :name, :tag
+    attr_reader :id, :image, :name, :tag, :auth
     #do not use this method directly, instead call create
     def initialize(options, docker_connection)
       @name              = options[:image]
       @tag               = options[:tag]
       @pull              = options[:pull]
-      @auth              = Armada::Image.auth(options[:username], options[:password], options[:email])
       @docker_connection = docker_connection
       @image             = options[:docker_image]
       @id                = @image.id if @image
+
+      @auth              = generate_auth(options)
     end
 
     def self.create(options, docker_connection)
@@ -43,8 +44,21 @@ module Armada
       ::Docker::Image.get(id, {}, connection)
     end
 
-    def self.auth(username, password, email = "")
-      return { :username => username, :password => password, :email => email } if username && password
+    def generate_auth(options)
+      dockercfg = options[:dockercfg].for_image @name if options[:dockercfg]
+      if dockercfg.nil?
+        dockercfg = Armada::Docker::Credentials.dummy
+      end
+
+      username = options.fetch(:username, dockercfg.username)
+      password = options.fetch(:password, dockercfg.password)
+      email    = options.fetch(:email,    dockercfg.email)
+
+      if username && password
+        return { :username => username, :password => password, :email => email }
+      else
+        return nil
+      end
     end
 
     def info(message)
@@ -58,7 +72,6 @@ module Armada
     def error(message)
       Armada.ui.error "#{@docker_connection.host} -- #{message}"
     end
-
   end
 end
 
