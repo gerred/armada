@@ -152,8 +152,12 @@ Options:
 * `tag` - This will override the tag defined in the descriptor
 * `username` - The username for the private registry of your image
 * `password` - The password for the private registry of your image
-* `health-check` - Performs a health check at container startup. If you specify the option without a value it defaults to true. Default is false.
+* `health-check` - Default is true. You can specify `--no-health-check` to not perform a health check during a rolling deploy.
 * `env-vars` - This allows for new or overriding env vars to be passed in from the command line. This option can only be specified once, but may take mulitple values.
+* `ssh-gateway` - This allows you to perform commands against a remote docker host(s) using a gateway.
+* `ssh-gateway-user` - The user opening the gateway
+* `pull` - Allows you to specify whether to pull the specified image or not. Defaults to true.
+* `dockercfg` - This is the path to the .dockercfg file which can be used instead of specifying the username and password for the registry. Defaults to `~/.dockercfg`
 
 Examples:
 ```bash
@@ -185,6 +189,10 @@ Options:
 * `password` - The password for the private registry of your image
 * `health-check` - Default is true. You can specify `--no-health-check` to not perform a health check during a rolling deploy.
 * `env-vars` - This allows for new or overriding env vars to be passed in from the command line. This option can only be specified once, but may take mulitple values.
+* `ssh-gateway` - This allows you to perform commands against a remote docker host(s) using a gateway.
+* `ssh-gateway-user` - The user opening the gateway
+* `pull` - Allows you to specify whether to pull the specified image or not. Defaults to true.
+* `dockercfg` - This is the path to the .dockercfg file which can be used instead of specifying the username and password for the registry. Defaults to `~/.dockercfg`
 
 Examples:
 ```bash
