@@ -31,5 +31,9 @@ module Armada
 
     desc "inspect SUBCOMMAND ...ARGS", "Info about the state of a docker host"
     subcommand "inspect", Armada::InspectCli
+
+    # desc "clean SUBCOMMAND ...ARGS", "Clean a docker host(s)"
+    # subcommand "clean", Armada::CleanCli
+
   end
 end

@@ -3,22 +3,14 @@ module Armada
 
     attr_reader :id, :image, :name, :tag, :auth
     #do not use this method directly, instead call create
-    def initialize(options, docker_connection)
-      @name              = options[:image]
-      @tag               = options[:tag]
-      @pull              = options[:pull]
-      @docker_connection = docker_connection
-      @image             = options[:docker_image]
-      @id                = @image.id if @image
-
-      @auth              = generate_auth(options)
-    end
-
-    def self.create(options, docker_connection)
-      image = Image.get("#{options[:image]}:#{options[:tag]}", docker_connection.connection)
-      options[:docker_image] = image
-      options[:id] = image.id if image
-      Image.new(options, docker_connection)
+    def initialize(docker_host, options)
+      @name        = options[:image]
+      @tag         = options[:tag]
+      @pull        = options[:pull]
+      @docker_host = docker_host
+      @image       = options[:docker_image]
+      @id          = @image.id if @image
+      @auth        = generate_auth(options)
     end
 
     def valid?
@@ -29,7 +21,7 @@ module Armada
       if @pull
         begin
           info "Pulling image [#{@name}] with tag [#{@tag}]"
-          @image = ::Docker::Image.create({:fromImage => @name, :tag => @tag}, @auth, @docker_connection.connection)
+          @image = ::Docker::Image.create({:fromImage => @name, :tag => @tag}, @auth, @docker_host.connection)
           @id = @image.id
         rescue Exception => e
           warn "An error occurred while trying to pull image [#{@name}] with tag [#{@tag}] -- #{e.message}"
@@ -38,10 +30,6 @@ module Armada
         info "Not pulling image [#{@name}] with tag [#{@tag}] because `--no-pull` was specified."
         raise "The image id is not set, you cannot proceed with the deploy until a valid image is found -- [#{@name}:#{@tag}]" unless valid?
       end
-    end
-
-    def self.get(id, connection)
-      ::Docker::Image.get(id, {}, connection)
     end
 
     def generate_auth(options)
@@ -62,15 +50,15 @@ module Armada
     end
 
     def info(message)
-      Armada.ui.info "#{@docker_connection.host} -- #{message}"
+      Armada.ui.info "#{@docker_host.host} -- #{message}"
     end
 
     def warn(message)
-      Armada.ui.warn "#{@docker_connection.host} -- #{message}"
+      Armada.ui.warn "#{@docker_host.host} -- #{message}"
     end
 
     def error(message)
-      Armada.ui.error "#{@docker_connection.host} -- #{message}"
+      Armada.ui.error "#{@docker_host.host} -- #{message}"
     end
   end
 end

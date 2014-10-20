@@ -2,13 +2,13 @@ module Armada
   class Container
 
     attr_reader :id, :container, :name
-    def initialize(image, options, docker_connection)
-      @id                = nil
-      @image             = image
-      @name              = options[:container_name]
-      @docker_connection = docker_connection
-      @container         = Armada::Container.get(@name, @docker_connection.connection)
-      @options           = options
+    def initialize(image, docker_host, options)
+      @docker_host = docker_host
+      @id          = nil
+      @image       = image
+      @name        = options[:container_name]
+      @container   = docker_host.get_container(@name)
+      @options     = options
     end
 
     def stop
@@ -23,19 +23,19 @@ module Armada
 
     def start
       info "Creating new container for image - #{@image.name}:#{@image.tag} with image id (#{@image.id}) with container name #{@name}"
-      container_config = Armada::Container.create_container_config(@image.id, @name, @docker_connection.host, @options)
+      container_config = Armada::Container.create_container_config(@image.id, @name, @docker_host.host, @options)
       begin
         @container = create(container_config)
         @id = @container.id
         info "Starting new container #{@id[0..11]}"
         @container.start!(Armada::Container.create_host_config(@options))
       rescue Exception => e
-        raise "Error occured on #{@docker_connection.host}:#{@docker_connection.port}: #{e.message}"
+        raise "Error occured on #{@docker_host.host}:#{@docker.port}: #{e.message}"
       end
     end
 
     def create(container_config)
-      ::Docker::Container.create(container_config, @docker_connection.connection)
+      ::Docker::Container.create(container_config, @docker_host.connection)
     end
 
     def kill
@@ -51,18 +51,6 @@ module Armada
         @container.remove
       rescue Exception => e
         error "Could not remove container #{@container.id[0..7]} (#{@name}).\nException was: #{e.message}"
-      end
-    end
-
-    def self.all(connection)
-      ::Docker::Container.all({:all => true}, connection)
-    end
-
-    def self.get(id, connection)
-      begin
-        return ::Docker::Container.get(id, {}, connection)
-      rescue Exception => e
-        return nil
       end
     end
 
@@ -109,15 +97,15 @@ module Armada
     private
 
     def info(message)
-      Armada.ui.info "#{@docker_connection.host} -- #{message}"
+      Armada.ui.info "#{@docker_host.host} -- #{message}"
     end
 
     def warn(message)
-      Armada.ui.warn "#{@docker_connection.host} -- #{message}"
+      Armada.ui.warn "#{@docker_host.host} -- #{message}"
     end
 
     def error(message)
-      Armada.ui.error "#{@docker_connection.host} -- #{message}"
+      Armada.ui.error "#{@docker_host.host} -- #{message}"
     end
 
   end

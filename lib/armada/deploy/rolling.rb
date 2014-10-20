@@ -13,14 +13,14 @@ module Armada
         Armada.ui.info "Deploying the following image [#{@options[:image]}:#{@options[:tag]}] to these host(s) #{@options[:hosts].join(', ')}"
         begin
           @options[:hosts].each_in_parallel do |host|
-            docker_connection = Armada::Connection::Docker.new(host, @options[:ssh_gateway], @options[:ssh_gateway_user])
-            Armada::Image.create(@options, docker_connection).pull
+            docker_host = Armada::Host.create(host, options)
+            docker_host.get_image(@options[:image], @options[:tag], @options).pull
           end
 
           @options[:hosts].each do |host|
-            docker_connection = Armada::Connection::Docker.new(host, @options[:ssh_gateway], @options[:ssh_gateway_user])
-            image = Armada::Image.create(@options, docker_connection)
-            container = Armada::Container.new(image, @options, docker_connection)
+            docker_host = Armada::Host.create(host, options)
+            image = docker_host.get_image @options[:image], @options[:tag], @options
+            container = Armada::Container.new(image, docker_host, @options)
             container.stop
             container.start
 

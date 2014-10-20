@@ -12,12 +12,12 @@ describe Armada::Container do
     :tag            => tag
   }}
 
-  let(:connection) { Armada::Connection::Docker.new("foo-01:4243") }
+  let(:docker_host) { Armada::Host.create("http://foo-01:4243") }
   let(:docker_connection) { ::Docker::Connection.new("http://foo-01:4243", {})}
-  let(:armada_image) { Armada::Image.new(options, connection) }
+  let(:armada_image) { Armada::Image.new(docker_host, options) }
   let(:docker_image) { ::Docker::Image.new(docker_connection, "id" => image_id) }
   let(:docker_container) { ::Docker::Container.send(:new, docker_connection, {'id' => container_id, 'Names' => ["/#{container_name}"]}) }
-  let(:armada_container) { Armada::Container.new(armada_image, options, connection) }
+  let(:armada_container) { Armada::Container.new(armada_image, docker_host, options) }
   let(:config) {{
     :port_bindings => { "1111/tcp" => [{"HostIp" => "0.0.0.0", "HostPort" => "1111"}],
                         "2222/udp" => [{"HostIp" => "0.0.0.0", "HostPort" => "2222"}]},
@@ -27,7 +27,7 @@ describe Armada::Container do
 
   describe "#stop" do
     context "when the container exists" do
-      before { Armada::Container.should_receive(:get).and_return(docker_container) }
+      before { docker_host.should_receive(:get_container).and_return(docker_container) }
       it "should call kill and remove" do
         expect(armada_container).to receive(:kill)
         expect(armada_container).to receive(:remove)
@@ -36,7 +36,7 @@ describe Armada::Container do
     end
 
     context "when the container does not exist" do
-      before { Armada::Container.should_receive(:get).and_return(nil) }
+      before { docker_host.should_receive(:get_container).and_return(nil) }
       it "should not call kill and remove" do
         expect(armada_container).not_to receive(:kill)
         expect(armada_container).not_to receive(:remove)
@@ -48,7 +48,7 @@ describe Armada::Container do
 
   describe "#kill" do
     context "when the container exists" do
-      before { Armada::Container.should_receive(:get).and_return(docker_container) }
+      before { docker_host.should_receive(:get_container).and_return(docker_container) }
       it "should call kill on the container" do
         expect(armada_container.container).to receive(:kill)
         armada_container.kill
@@ -61,7 +61,7 @@ describe Armada::Container do
     end
 
     context "when the container does not exist" do
-      before { Armada::Container.should_receive(:get).and_return(nil) }
+      before { docker_host.should_receive(:get_container).and_return(nil) }
       it "should not call kill" do
         allow_message_expectations_on_nil
         expect(armada_container.container).not_to receive(:kill)
@@ -72,7 +72,7 @@ describe Armada::Container do
 
   describe "#remove" do
     context "when the container exists" do
-      before { Armada::Container.should_receive(:get).and_return(docker_container) }
+      before { docker_host.should_receive(:get_container).and_return(docker_container) }
       it "should call remove on the container" do
         expect(armada_container.container).to receive(:remove)
         armada_container.remove
@@ -91,7 +91,7 @@ describe Armada::Container do
     end
 
     context "when the container does not exist" do
-      before { Armada::Container.should_receive(:get).and_return(nil) }
+      before { docker_host.should_receive(:get_container).and_return(nil) }
       it "should not call remove" do
         allow_message_expectations_on_nil
         expect(armada_container.container).not_to receive(:remove)

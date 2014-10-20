@@ -17,9 +17,9 @@ describe Armada::Image do
     :pull  => pull
   }}
 
-  let(:connection) { Armada::Connection::Docker.new("foo-01:4243") }
+  let(:docker_host) { Armada::Host.create("foo-01:4243") }
   let(:docker_connection) { ::Docker::Connection.new("http://foo-01", {}) }
-  let(:armada_image) { Armada::Image.new(options, connection) }
+  let(:armada_image) { Armada::Image.new(docker_host, options) }
   let(:docker_image) { ::Docker::Image.new(docker_connection, "id" => image_id) }
 
   describe "#pull" do
@@ -59,7 +59,7 @@ describe Armada::Image do
         })
       }
 
-      let (:image) { Armada::Image.new(my_options, connection) }
+      let (:image) { Armada::Image.new(docker_host, my_options) }
 
       it "should use username and password from options" do
         expect(image.auth[:username]).to be(my_options[:username])
@@ -74,7 +74,7 @@ describe Armada::Image do
         })
       }
 
-      let (:image) { Armada::Image.new(my_options, connection) }
+      let (:image) { Armada::Image.new(docker_host, my_options) }
 
       it "should use username and password from dockercfg" do
         expect(image.auth).not_to be_nil
@@ -91,7 +91,7 @@ describe Armada::Image do
         })
       }
 
-      let (:image) { Armada::Image.new(my_options, connection) }
+      let (:image) { Armada::Image.new(docker_host, my_options) }
 
       it "should use username and password from options" do
         expect(image.auth[:username]).to be(my_options[:username])
@@ -100,7 +100,7 @@ describe Armada::Image do
     end
 
     context 'with no auth and no dockercfg' do
-      let (:image) { Armada::Image.new(options, connection)}
+      let (:image) { Armada::Image.new(docker_host, options)}
 
       it "should use username and password from options" do
         expect(image.auth).to be_nil

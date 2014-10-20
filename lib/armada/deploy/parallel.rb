@@ -14,14 +14,13 @@ module Armada
 
         begin
           @options[:hosts].each_in_parallel do |host|
-            docker_connection = Armada::Connection::Docker.new(host, @options[:ssh_gateway], @options[:ssh_gateway_user])
-            image = Armada::Image.create(@options, docker_connection)
+            docker_host = Armada::Host.create(host, options)
+            image = docker_host.get_image @options[:image], @options[:tag], @options
             image.pull
 
-            container = Armada::Container.new(image, @options, docker_connection)
+            container = Armada::Container.new(image, docker_host, @options)
             container.stop
             container.start
-
 
             if @options[:health_check]
               raise "Health check failed! - #{host}" unless Armada::Connection::HealthCheck.new(host, @options[:health_check_port],
