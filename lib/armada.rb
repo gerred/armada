@@ -4,6 +4,7 @@ require 'awesome_print'
 require 'table_print'
 
 require_relative 'armada/cli'
+require_relative 'armada/clean'
 require_relative 'armada/configuration'
 require_relative 'armada/connection'
 require_relative 'armada/deploy'
@@ -32,5 +33,5 @@ module Armada
 end
 
 Excon.defaults[:connect_timeout] = 20
-Excon.defaults[:read_timeout]    = 20
+Excon.defaults[:read_timeout]    = 60
 Excon.defaults[:write_timeout]   = 20

@@ -19,6 +19,10 @@ module Armada
       Image.new(self, options)
     end
 
+    def get_all_images
+      ::Docker::Image.all({:all => true}, connection)
+    end
+
     def get_all_containers
       ::Docker::Container.all({:all => true}, connection)
     end

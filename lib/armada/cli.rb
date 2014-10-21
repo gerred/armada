@@ -1,5 +1,6 @@
 require_relative 'cli/deploy'
 require_relative 'cli/inspect'
+require_relative 'cli/clean'
 
 module Armada
   class Cli < Thor
@@ -32,8 +33,8 @@ module Armada
     desc "inspect SUBCOMMAND ...ARGS", "Info about the state of a docker host"
     subcommand "inspect", Armada::InspectCli
 
-    # desc "clean SUBCOMMAND ...ARGS", "Clean a docker host(s)"
-    # subcommand "clean", Armada::CleanCli
+    desc "clean SUBCOMMAND ...ARGS", "Clean a docker host(s)"
+    subcommand "clean", Armada::CleanCli
 
   end
 end
