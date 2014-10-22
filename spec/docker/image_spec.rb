@@ -102,7 +102,7 @@ describe Armada::Image do
     context 'with no auth and no dockercfg' do
       let (:image) { Armada::Image.new(docker_host, options)}
 
-      it "should use username and password from options" do
+      it "should have no auth credentials" do
         expect(image.auth).to be_nil
       end
     end

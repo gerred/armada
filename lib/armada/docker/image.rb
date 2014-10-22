@@ -32,18 +32,39 @@ module Armada
       end
     end
 
-    def generate_auth(options)
-      dockercfg = options[:dockercfg].for_image @name if options[:dockercfg]
-      if dockercfg.nil?
-        dockercfg = Armada::Docker::Credentials.dummy
+    def extract_credentials(options)
+      options_credentials = options.select { |k, v| [:username, :password, :email].include? k }
+      unless options_credentials.empty?
+        return options_credentials
+      else
+        dockercfg = options[:dockercfg].for_image @name if options[:dockercfg]
+        if dockercfg.nil?
+          return {}
+        else
+          return {
+            :username => dockercfg.username,
+            :password => dockercfg.password,
+            :email    => dockercfg.email
+          }
+        end
+      end
+    end
+
+    def valid_credentials?(m)
+      [:username, :password].each do |k|
+        unless m.include? k
+          return false
+        end
       end
 
-      username = options.fetch(:username, dockercfg.username)
-      password = options.fetch(:password, dockercfg.password)
-      email    = options.fetch(:email,    dockercfg.email)
+      return true
+    end
 
-      if username && password
-        return { :username => username, :password => password, :email => email }
+    def generate_auth(options)
+      credentials = extract_credentials(options)
+
+      if valid_credentials? credentials
+        return credentials
       else
         return nil
       end
