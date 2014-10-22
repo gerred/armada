@@ -150,8 +150,8 @@ Options:
 * `hosts` - This will override the hosts defined in the descriptor
 * `image` - This will override the image defined in the descriptor
 * `tag` - This will override the tag defined in the descriptor
-* `username` - The username for the private registry of your image
-* `password` - The password for the private registry of your image
+* `username` - The username for the private registry of your image, if specified you must also specify `password`
+* `password` - The password for the private registry of your image, if specified you must also specify `username`
 * `health-check` - Default is true. You can specify `--no-health-check` to not perform a health check during a rolling deploy.
 * `env-vars` - This allows for new or overriding env vars to be passed in from the command line. This option can only be specified once, but may take mulitple values.
 * `ssh-gateway` - This allows you to perform commands against a remote docker host(s) using a gateway.
@@ -185,8 +185,8 @@ Options:
 * `hosts` - This will override the hosts defined in the descriptor
 * `image` - This will override the image defined in the descriptor
 * `tag` - This will override the tag defined in the descriptor
-* `username` - The username for the private registry of your image
-* `password` - The password for the private registry of your image
+* `username` - The username for the private registry of your image, if specified you must also specify `password`
+* `password` - The password for the private registry of your image, if specified you must also specify `username`
 * `health-check` - Default is true. You can specify `--no-health-check` to not perform a health check during a rolling deploy.
 * `env-vars` - This allows for new or overriding env vars to be passed in from the command line. This option can only be specified once, but may take mulitple values.
 * `ssh-gateway` - This allows you to perform commands against a remote docker host(s) using a gateway.

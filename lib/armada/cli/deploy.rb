@@ -6,8 +6,8 @@ module Armada
         option :hosts,            :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
         option :image,            :type => :string,  :aliases => :i, :desc => "The image to use when deploying"
         option :tag,              :type => :string,  :aliases => :t, :desc => "Which version of the image to use", :lazy_default => "latest"
-        option :username,         :type => :string,  :aliases => :u, :desc => "Docker registry username, overrides username from --dockercfg"
-        option :password,         :type => :string,  :aliases => :p, :desc => "Docker registry password, overrides password from --dockercfg"
+        option :username,         :type => :string,  :aliases => :u, :desc => "Docker registry username, if specified, --password must also be specified"
+        option :password,         :type => :string,  :aliases => :p, :desc => "Docker registry password, if specified, --username must also be specified"
         option :health_check,     :type => :boolean, :aliases => :c, :desc => "Perform health check of container. Default is true", :default => true
         option :env_vars,         :type => :hash,    :aliases => :e, :desc => "Environment Variables to pass into the container"
         option :pull,             :type => :boolean,                 :desc => "Whether to pull the image from the docker registry", :default => true
