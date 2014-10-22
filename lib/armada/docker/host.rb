@@ -6,17 +6,27 @@ module Armada
     end
 
     def get_image(name, tag, options = {})
-      image = ::Docker::Image.get("#{name}:#{tag}", {}, connection)
-      options[:docker_image] = image
-      options[:id] = image.id if image
-      Image.new(self, options)
+      begin
+        image = ::Docker::Image.get("#{name}:#{tag}", {}, connection)
+        options[:docker_image] = image
+        options[:id] = image.id if image
+      rescue Exception => e
+        Armada.ui.warn "#{host} -- #{e.message}"
+      ensure
+        return Image.new(self, options)
+      end
     end
 
     def get_image_by_id(id, options)
-      image = ::Docker::Image.get(id, {}, connection)
-      options[:docker_image] = image
-      options[:id] = id
-      Image.new(self, options)
+      begin
+        image = ::Docker::Image.get(id, {}, connection)
+        options[:docker_image] = image
+        options[:id] = id
+      rescue Exception => e
+        Armada.ui.warn "#{host} -- #{e.message}"
+      ensure
+        return Image.new(self, options)
+      end
     end
 
     def get_all_images
@@ -45,6 +55,10 @@ module Armada
 
     def port
       @docker_connection.port
+    end
+
+    def to_s
+      "#{host}:#{port} -- #{connection}"
     end
 
     def self.create(host, options = {})
