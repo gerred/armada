@@ -30,7 +30,7 @@ module Armada
         info "Starting new container #{@id[0..11]}"
         @container.start!(Armada::Container.create_host_config(@options))
       rescue Exception => e
-        raise "Error occured on #{@docker_host.host}:#{@docker.port}: #{e.message}"
+        raise "Error occured on #{@docker_host.host}:#{@docker_host.port}: #{e.message}"
       end
     end
 
