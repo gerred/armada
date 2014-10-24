@@ -83,6 +83,10 @@ module Armada::DeployDSL
     )
   end
 
+  def restart_policy(opts)
+    set(:restart_policy, opts)
+  end
+
   def public_port_for(port_bindings)
     # {'80/tcp'=>[{'HostIp'=>'0.0.0.0', 'HostPort'=>'80'}]}
     first_port_binding = port_bindings.values.first

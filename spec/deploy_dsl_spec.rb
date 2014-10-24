@@ -23,6 +23,11 @@ describe Armada::DeployDSL do
     expect(DeployDSLTest.fetch(:hosts)).to include("host1", "host2")
   end
 
+  it 'adds the restart policy' do
+    DeployDSLTest.restart_policy({:foo => "bar"})
+    expect(DeployDSLTest.fetch(:restart_policy)).to eq({:foo => "bar"})
+  end
+
   describe '#localhost' do
     it 'adds a host by reading DOCKER_HOST if present' do
       expect(ENV).to receive(:[]).with('DOCKER_HOST').and_return('tcp://127.1.1.1:4240')
