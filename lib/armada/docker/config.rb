@@ -23,6 +23,7 @@ module Armada
 
         if File.readable? abs_path
           json_hash = JSON.parse(IO.read(abs_path))
+          Armada.ui.info "Loading dockercfg from: #{abs_path}"
           json_hash.each do |url, obj|
             configs.push Credentials.parse(url, obj)
           end
