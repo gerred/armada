@@ -91,6 +91,11 @@ module Armada
         container_config['name'] = container_name
         #should we do soemthing if container name isnt set?
       end
+
+      if options[:restart_policy]
+        container_config["RestartPolicy"] = options[:restart_policy]
+      end
+
       container_config
     end
 
