@@ -99,6 +99,11 @@ module Armada
       container_config
     end
 
+    def port_bindings()
+      status = ::Docker::Container.get(@id, {}, @docker_host.connection)
+      return status.info["HostConfig"]["PortBindings"]
+    end
+
     private
 
     def info(message)
@@ -112,6 +117,5 @@ module Armada
     def error(message)
       Armada.ui.error "#{@docker_host.host} -- #{message}"
     end
-
   end
 end
