@@ -87,6 +87,10 @@ module Armada::DeployDSL
     set(:restart_policy, opts)
   end
 
+  def secret_value(key)
+    `conjur variable value #{key}`
+  end
+
   def public_port_for(port_bindings)
     # {'80/tcp'=>[{'HostIp'=>'0.0.0.0', 'HostPort'=>'80'}]}
     first_port_binding = port_bindings.values.first
