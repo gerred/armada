@@ -133,6 +133,13 @@ set :deploy_retries, 60 #number of times to check if the container is up and hea
 set :deploy_wait_time, 1 #number of seconds to wait between each retry
 ```
 
+#### Raw Container Config
+If you want to use a docker feature not yet exposed through the armadafile, you can include a raw container config, and the rest of the armadafile will be applied on top of it.
+
+```ruby
+container_config { "Cmd" => [ "date" ] }
+```
+
 ## CLI
 The CLI is written using [Thor](http://whatisthor.com/). Below is current commands that can be executed using the Armada gem.
 
