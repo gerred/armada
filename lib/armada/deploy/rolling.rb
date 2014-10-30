@@ -25,12 +25,12 @@ module Armada
             container.start
 
             if @options[:health_check]
-              port_bindings = container.port_bindings
-              health_check_binding = port_bindings["#{@options[:health_check_port]}/tcp"].first
+              ports = container.ports
+              health_check_port = ports["#{@options[:health_check_port]}/tcp"].first["HostPort"]
 
               health_check = Armada::Connection::HealthCheck.new(
                 host,
-                health_check_binding["HostPort"],
+                health_check_port,
                 @options[:health_check_endpoint],
                 @options[:health_check_delay],
                 @options[:health_check_retries],

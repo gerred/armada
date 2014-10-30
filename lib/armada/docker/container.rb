@@ -99,9 +99,8 @@ module Armada
       container_config
     end
 
-    def port_bindings()
-      status = ::Docker::Container.get(@id, {}, @docker_host.connection)
-      return status.info["HostConfig"]["PortBindings"]
+    def ports
+      return @container.json["NetworkSettings"]["Ports"]
     end
 
     private
