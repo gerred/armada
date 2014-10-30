@@ -108,6 +108,10 @@ module Armada::DeployDSL
     set(:binds, binds)
   end
 
+  def container_config(cfg)
+    set(:container_config, cfg)
+  end
+
   private
 
   def add_to_bindings(host_ip, container_port, port, type='tcp')
