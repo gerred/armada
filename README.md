@@ -113,6 +113,14 @@ Examples:
 container_name 'zuul'
 ```
 
+#### Docker Restart Policy
+You can add your own Docker Restart policy, see the [API documentation](https://docs.docker.com/reference/api/docker_remote_api_v1.15/#create-a-container)
+
+```ruby
+restart_policy { "Name" => "always" }
+restart_policy { "Name" => "on-failure", "MaximumRetryCount" => 5 }
+```
+
 #### Setting other descriptor values
 Some configuration options are not set using a DSL method. Instead you must call the `set` method. The current list of these options are:
 
