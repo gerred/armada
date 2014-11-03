@@ -113,6 +113,14 @@ Examples:
 container_name 'zuul'
 ```
 
+#### Docker Restart Policy
+You can add your own Docker Restart policy, see the [API documentation](https://docs.docker.com/reference/api/docker_remote_api_v1.15/#create-a-container)
+
+```ruby
+restart_policy { "Name" => "always" }
+restart_policy { "Name" => "on-failure", "MaximumRetryCount" => 5 }
+```
+
 #### Setting other descriptor values
 Some configuration options are not set using a DSL method. Instead you must call the `set` method. The current list of these options are:
 
@@ -123,6 +131,13 @@ set :health_check_endpoint, '/_metrics/healthcheck'
 set :health_check_port, 3100
 set :deploy_retries, 60 #number of times to check if the container is up and healthy
 set :deploy_wait_time, 1 #number of seconds to wait between each retry
+```
+
+#### Raw Container Config
+If you want to use a docker feature not yet exposed through the armadafile, you can include a raw container config, and the rest of the armadafile will be applied on top of it.
+
+```ruby
+container_config { "Cmd" => [ "date" ] }
 ```
 
 ## CLI
