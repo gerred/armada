@@ -22,10 +22,14 @@ module Armada
             container.stop
             container.start
 
-            if @options[:health_check]
+            if @options[:health_check] && @options[:health_check_port]
               ports = container.ports
-              health_check_port = ports["#{@options[:health_check_port]}/tcp"].first["HostPort"]
 
+              if ports.empty?
+                raise "No ports exposed for this container. Please expose a port for the health check or use the --no-health-check option!"
+              end
+
+              health_check_port = ports["#{@options[:health_check_port]}/tcp"][0]["HostPort"]
               health_check = Armada::Connection::HealthCheck.new(
                 host,
                 health_check_port,
