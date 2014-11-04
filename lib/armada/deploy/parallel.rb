@@ -29,7 +29,12 @@ module Armada
                 raise "No ports exposed for this container. Please expose a port for the health check or use the --no-health-check option!"
               end
 
-              health_check_port = ports["#{@options[:health_check_port]}/tcp"][0]["HostPort"]
+              begin
+                health_check_port = ports["#{@options[:health_check_port]}/tcp"][0]["HostPort"]
+              rescue Exception => e
+                raise "Could not find the host port for [#{health_check_port}]. Make sure you put the container port as the :health_check_port."
+              end
+
               health_check = Armada::Connection::HealthCheck.new(
                 host,
                 health_check_port,
