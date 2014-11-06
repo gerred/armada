@@ -32,6 +32,6 @@ module Armada
   end
 end
 
-Excon.defaults[:connect_timeout] = 20
-Excon.defaults[:read_timeout]    = 60
-Excon.defaults[:write_timeout]   = 20
+Excon.defaults[:connect_timeout] = 120
+Excon.defaults[:read_timeout]    = 120
+Excon.defaults[:write_timeout]   = 120

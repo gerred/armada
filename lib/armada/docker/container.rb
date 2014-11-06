@@ -65,7 +65,7 @@ module Armada
     def self.create_container_config(image_id, container_name, host, options = {})
       container_config = options[:container_config] || {}
 
-      container_config['Image'] = image_id
+      container_config['Image'] = image_id || options[:image]
       container_config['Hostname'] = host
 
       if options[:port_bindings]
