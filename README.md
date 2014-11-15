@@ -219,7 +219,7 @@ armada deploy rolling foo prod --env-vars PORT:4343 DB_USER:"FOO"
 Rally welcomes any bug fixes or new functionality. Please feel free to open an issue or pull request with a fix or even a test that reproduces a bug. We cannot promise an immediate response but we will try hard to get back to you as soon as possible.
 
 ## Maintainers
-[Jonathan Chauncey (jchauncey)](https://github.com/jchauncey)
+[Jonathan Chauncey (jchauncey)](https://github.com/jchauncey)  
 [Darrel Hamilton (zeroem)](https://github.com/zeroem)
 
 ## License
