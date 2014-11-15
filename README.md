@@ -129,9 +129,10 @@ set :image, 'quay.io/rallysoftware/bag-boy'
 set :tag, '0.1.0'
 set :health_check_endpoint, '/_metrics/healthcheck'
 set :health_check_port, 3100
-set :deploy_retries, 60 #number of times to check if the container is up and healthy
-set :deploy_wait_time, 1 #number of seconds to wait between each retry
+set :health_check_retries, 60 #number of times to check if the container is up and healthy
+set :health_check_delay, 1 #number of seconds to wait between each retry
 ```
+**health_check_port will work even if you do not specify a contianer -> host port mapping. Armada will determine the dynamically assigned port to the expected container health check port and use that when performing the health check.**
 
 #### Raw Container Config
 If you want to use a docker feature not yet exposed through the armadafile, you can include a raw container config, and the rest of the armadafile will be applied on top of it.
