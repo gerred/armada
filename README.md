@@ -2,6 +2,12 @@
 
 Armada is a docker deployment tool which we originally forked from the [NewRelic Centurion](https://github.com/newrelic/centurion) project. It has since seen a huge refactor occur where we started using the [swipely/docker-api](https://github.com/swipely/docker-api) gem for interacting with our docker hosts instead of the mix of docker-cli and api calls that Centurion makes. The DSL is largely unchanged as it works really well for our intended purposes.
 
+## Disclaimer
+This gem is used in production for deployments at Rally Software. We like the structure it gives us and the simplicity of the DSL. If you feel that we are missing something please open an issue and let's have a discussion about it. If you find a bug please submit an issue and if possible a reproducible test case. 
+
+### Known Issues
+* During a deploy (either parallel or rolling) the pull fails to complete and Armada will catch a NilClass exception. The deploy will finish, however, it will fail to download the latest image from the registry. This means it deploys an older image.
+
 ## Installation
 
 ```
@@ -139,6 +145,7 @@ If you want to use a docker feature not yet exposed through the armadafile, you 
 
 ```ruby
 container_config { "Cmd" => [ "date" ] }
+container_config { "Privileged" => false }
 ```
 
 ## CLI
@@ -221,7 +228,7 @@ Rally welcomes any bug fixes or new functionality. Please feel free to open an i
 
 ## Maintainers
 [Jonathan Chauncey (jchauncey)](https://github.com/jchauncey)  
-[Darrel Hamilton (zeroem)](https://github.com/zeroem)
+[Darrell Hamilton (zeroem)](https://github.com/zeroem)
 
 ## License
 Copyright (c) 2013 Rally Software Development Corp
