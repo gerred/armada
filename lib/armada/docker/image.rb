@@ -24,7 +24,7 @@ module Armada
           @image = ::Docker::Image.create({:fromImage => @name, :tag => @tag}, @auth, @docker_host.connection)
           @id = @image.id
         rescue Exception => e
-          warn "An error occurred while trying to pull image [#{@name}] with tag [#{@tag}] -- #{e.message}"
+          raise "An error occurred while trying to pull image [#{@name}] with tag [#{@tag}] -- #{e.message}"
         end
       else
         info "Not pulling image [#{@name}] with tag [#{@tag}] because `--no-pull` was specified."
