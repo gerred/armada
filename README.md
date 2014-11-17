@@ -1,3 +1,6 @@
+[![TravisCI](https://travis-ci.org/RallySoftware/armada.svg)](https://travis-ci.org/RallySoftware/armada)
+
+
 ## Description
 
 Armada is a docker deployment tool which we originally forked from the [NewRelic Centurion](https://github.com/newrelic/centurion) project. It has since seen a huge refactor occur where we started using the [swipely/docker-api](https://github.com/swipely/docker-api) gem for interacting with our docker hosts instead of the mix of docker-cli and api calls that Centurion makes. The DSL is largely unchanged as it works really well for our intended purposes.
