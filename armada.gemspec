@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'armada/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'armada'
+  spec.name          = 'docker-armada'
   spec.version       = Armada::VERSION
   spec.authors       = ['Jonathan Chauncey', 'Matt Farrar', 'Darrell Hamilton']
   spec.summary       = 'Deploy utility for docker containers'
