@@ -13,7 +13,7 @@ module Armada
         @hosts.each_in_parallel do |host|
           docker_host = Armada::Host.create(host, @options)
           docker_host.get_all_images.each do |image|
-            if image.info["RepoTags"].include?("<none>:<none>") && !image.info["ParentId"]
+            if image.info["RepoTags"].include?("<none>:<none>")
               begin
                 Armada.ui.info "#{docker_host.host} -- #{image.id[0..11]} is an abandoned image and will be removed"
                 image.remove({:force => true, :noprune => @noprune}) if @force
