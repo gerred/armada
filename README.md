@@ -12,7 +12,7 @@ This gem is used in production for deployments at Rally Software. We like the st
 ## Installation
 
 ```
-$ gem install armada
+$ gem install docker-armada
 ```
 
 ## Writing your service descriptor
