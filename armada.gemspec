@@ -6,7 +6,7 @@ require 'armada/version'
 Gem::Specification.new do |spec|
   spec.name          = 'armada'
   spec.version       = Armada::VERSION
-  spec.authors       = ['Jonathan Chauncey', 'Matt Farrar']
+  spec.authors       = ['Jonathan Chauncey', 'Matt Farrar', 'Darrell Hamilton']
   spec.summary       = 'Deploy utility for docker containers'
   spec.description   = 'Deploy utility for docker containers'
   spec.homepage      = 'https://github.com/RallySoftware/armada'
