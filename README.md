@@ -1,4 +1,5 @@
-[![TravisCI](https://travis-ci.org/RallySoftware/armada.svg)](https://travis-ci.org/RallySoftware/armada)
+[![TravisCI](https://travis-ci.org/RallySoftware/armada.svg)](https://travis-ci.org/RallySoftware/armada)  
+[![Gem Version](https://badge.fury.io/rb/docker-armada.svg)](http://badge.fury.io/rb/docker-armada)
 
 
 ## Description
