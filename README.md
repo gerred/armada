@@ -8,16 +8,15 @@ This gem is used in production for deployments at Rally Software. We like the st
 ## Installation
 
 ```
-$ gem sources -a http://gems.f4tech.com
 $ gem install armada
 ```
 
 ## Writing your service descriptor
-Currently, all descriptors live at [RallySoftware/armada-configs](https://github.com/RallySoftware/armada-configs) in the `config/armada` directory.
-
-Descriptors are in the form of a Rake task that uses a built-in DSL to make them
+Descriptors are in the form of a Rake file that uses a built-in DSL to make them
 easy to write. Here's a sample config for a project called `myservice` that
-would go into `config/armada/myservice.rake`:
+would go into `$CWD/myservice.rake`:
+
+**Armada will look in the current working directory for your service descriptor. We recommend placing this descriptor in your service's repository**
 
 ```ruby
 namespace :environment do
