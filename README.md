@@ -5,9 +5,6 @@ Armada is a docker deployment tool which we originally forked from the [NewRelic
 ## Disclaimer
 This gem is used in production for deployments at Rally Software. We like the structure it gives us and the simplicity of the DSL. If you feel that we are missing something please open an issue and let's have a discussion about it. If you find a bug please submit an issue and if possible a reproducible test case. 
 
-### Known Issues
-* During a deploy (either parallel or rolling) the pull fails to complete and Armada will catch a NilClass exception. The deploy will finish, however, it will fail to download the latest image from the registry. This means it deploys an older image.
-
 ## Installation
 
 ```
@@ -19,15 +16,15 @@ $ gem install armada
 Currently, all descriptors live at [RallySoftware/armada-configs](https://github.com/RallySoftware/armada-configs) in the `config/armada` directory.
 
 Descriptors are in the form of a Rake task that uses a built-in DSL to make them
-easy to write. Here's a sample config for a project called `zuulboy` that
-would go into `config/armada/zuulboy.rake`:
+easy to write. Here's a sample config for a project called `myservice` that
+would go into `config/armada/myservice.rake`:
 
 ```ruby
 namespace :environment do
   task :common do
-    env_vars LOG_DIR: '/home/zuul/logs/zuul'
-    container_name 'zuul'
-    set :image, 'quay.io/rallysoftware/zuul'
+    env_vars LOG_DIR: '/home/myservice/logs/myservice'
+    container_name 'myservice'
+    set :image, 'quay.io/rallysoftware/myservice'
     set :health_check_endpoint, '/metrics/healthcheck'
     set :health_check_port, 3000
     host_port 3000, container_port: 3000
@@ -36,17 +33,17 @@ namespace :environment do
   desc 'Boulder environment'
   task :bld => :common do
     set_current_environment(:bld)
-    host 'bld-zb-01:4243'
-    host 'bld-zb-02:4243'
-    host 'bld-zb-03:4243'
+    host 'bld-myservice-01:3534'
+    host 'bld-myservice-02:3534'
+    host 'bld-myservice-03:3534'
   end
 
-  desc 'Qwest Denver Production environment'
-  task :qd => :common do
-    set_current_environment(:qd)
-    host 'qd-zb-01:4243'
-    host 'qd-zb-02:4243'
-    host 'qd-zb-03:4243'
+  desc 'Production Environment'
+  task :prod => :common do
+    set_current_environment(:prod)
+    host 'prod-myservice-01:3534'
+    host 'prod-myservice-02:3534'
+    host 'prod-myservice-03:3534'
   end
 
 end
@@ -56,7 +53,7 @@ end
 The `common` task is used to DRY up your descriptor file. It will always be loaded first allowing you to specify common elements of your deployment here and not repeat them throughout the rest of the file. You could also specify common elements here and then override them in later tasks if you need.
 
 ### Tasks
-Each task should represent a logical unit of seperation from the rest. For instance, in the above descriptor we are describing each of the environments where the `zuulboy` project can reside.
+Each task should represent a logical unit of seperation from the rest. For instance, in the above descriptor we are describing each of the environments where the `myservice` project can reside.
 
 ### Armada DSL
 Armada provides a few convenience methods for adding items such as host and environment variables to a list.
@@ -116,7 +113,7 @@ The `container_name` method takes 1 parameter which is a string to name the cont
 
 Examples:
 ```ruby
-container_name 'zuul'
+container_name 'myservice'
 ```
 
 #### Docker Restart Policy
@@ -131,7 +128,7 @@ restart_policy { "Name" => "on-failure", "MaximumRetryCount" => 5 }
 Some configuration options are not set using a DSL method. Instead you must call the `set` method. The current list of these options are:
 
 ```ruby
-set :image, 'quay.io/rallysoftware/bag-boy'
+set :image, 'quay.io/myorg/myservice'
 set :tag, '0.1.0'
 set :health_check_endpoint, '/_metrics/healthcheck'
 set :health_check_port, 3100
@@ -150,6 +147,14 @@ container_config { "Privileged" => false }
 
 ## CLI
 The CLI is written using [Thor](http://whatisthor.com/). Below is current commands that can be executed using the Armada gem.
+
+### Help
+Examples:
+```bash
+aramda help -- print the main help menu
+armada deploy help parallel -- print the help menu for the parallel subcommand
+armada deploy help
+```
 
 ### Deploy
 The following tasks can be used when deploying a container to a set of docker hosts.
@@ -223,15 +228,48 @@ armada deploy rolling foo prod --hosts my-prod-host:5555 --username username --p
 armada deploy rolling foo prod --env-vars PORT:4343 DB_USER:"FOO"
 ```
 
-## Contributing
-Rally welcomes any bug fixes or new functionality. Please feel free to open an issue or pull request with a fix or even a test that reproduces a bug. We cannot promise an immediate response but we will try hard to get back to you as soon as possible.
+### Clean
+The clean commands offer a way to clean up stale images or old containers from a host or set of hosts. You can issue these commands through a gateway if you like.
+
+#### Containers
+This will remove all containers that are not running or paused.
+
+Options:
+* `hosts` - The list of hosts you wish to perform this action against
+* `ssh-gateway` - This allows you to perform commands against a remote docker host(s) using a gateway.
+* `ssh-gateway-user` - The user opening the gateway
+* `force` - Force the action to take place. ** If this option is not specified it will perform a dry run**
+
+Examples:
+```bash
+armada clean containers --hosts my-docker-host-01:3435
+```
+
+#### Images
+This will remove all images that are considered "orphaned". This means they are tagged as <none> if you run the `docker images` command. You will notice that this command will print out an error like the following:
+
+```bash
+bld-docker-01 -- unable to remove image 9d535e81db1e because of the following error - Expected([200, 201, 202, 203, 204, 304]) <=> Actual(409 Conflict)
+```
+This is because it is not the parent image. We are working to resolve this problem. You may also have to run this command a few times to get all the images cleaned up. 
+
+Options:
+* `hosts` - The list of hosts you wish to perform this action against
+* `ssh-gateway` - This allows you to perform commands against a remote docker host(s) using a gateway.
+* `ssh-gateway-user` - The user opening the gateway
+* `force` - Force the action to take place. ** If this option is not specified it will perform a dry run**
+
+Examples:
+```bash
+armada clean images --hosts my-docker-host-01:3435
+```
 
 ## Maintainers
 [Jonathan Chauncey (jchauncey)](https://github.com/jchauncey)  
 [Darrell Hamilton (zeroem)](https://github.com/zeroem)
 
 ## License
-Copyright (c) 2013 Rally Software Development Corp
+Copyright (c) 2014 Rally Software Development Corp
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
