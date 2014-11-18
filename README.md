@@ -150,8 +150,8 @@ Armada can perform a http health check for your application. There are 4 pieces 
 If you want to use a docker feature not yet exposed through the armadafile, you can include a raw container config, and the rest of the armadafile will be applied on top of it.
 
 ```ruby
-container_config { "Cmd" => [ "date" ] }
-container_config { "Privileged" => false }
+container_config({ "Cmd" => [ "date" ] })
+container_config({"Privileged" => true})
 ```
 
 ## CLI
