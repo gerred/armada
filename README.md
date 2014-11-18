@@ -1,5 +1,6 @@
 [![TravisCI](https://travis-ci.org/RallySoftware/armada.svg)](https://travis-ci.org/RallySoftware/armada)  
 [![Gem Version](https://badge.fury.io/rb/docker-armada.svg)](http://badge.fury.io/rb/docker-armada)
+[![Stories in Ready](https://badge.waffle.io/RallySoftware/armada.svg?label=ready&title=Ready)](http://waffle.io/RallySoftware/armada)
 
 
 ## Description
@@ -133,11 +134,16 @@ Some configuration options are not set using a DSL method. Instead you must call
 ```ruby
 set :image, 'quay.io/myorg/myservice'
 set :tag, '0.1.0'
-set :health_check_endpoint, '/_metrics/healthcheck'
-set :health_check_port, 3100
-set :health_check_retries, 60 #number of times to check if the container is up and healthy
-set :health_check_delay, 1 #number of seconds to wait between each retry
 ```
+
+#### Health Checks
+Armada can perform a http health check for your application. There are 4 pieces of information you can specify as part of a health check.
+
+* `health_check_endpoint` - Can be any end point that returns a status 200. Default:`/`
+* `health_check_port` - This should be the port exposed by the container that the health check is listening on. **Not the host mapped value**
+* `health_check_retries` - The number of times we will retry issuing a health check. Default:`60`
+* `health_check_delay` - The number of seconds to wait between health check retries. Default:`1`
+
 **health_check_port will work even if you do not specify a contianer -> host port mapping. Armada will determine the dynamically assigned port to the expected container health check port and use that when performing the health check.**
 
 #### Raw Container Config
