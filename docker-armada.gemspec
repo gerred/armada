@@ -18,20 +18,20 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'excon', '~> 0.33'
-  spec.add_dependency 'net-ssh'
-  spec.add_dependency 'net-ssh-gateway'
+  spec.add_dependency 'net-ssh', '~> 2.9'
+  spec.add_dependency 'net-ssh-gateway', '~> 1.2'
   spec.add_dependency 'docker-api', '~> 1.13'
   spec.add_dependency 'thor', '~> 0.19'
-  spec.add_dependency 'awesome_print'
-  spec.add_dependency 'table_print'
-  spec.add_dependency 'conjur-cli'
+  spec.add_dependency 'awesome_print', '~> 1.2'
+  spec.add_dependency 'table_print', '~> 1.5'
+  spec.add_dependency 'conjur-cli', '~> 4.17'
 
-  spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'bundler', '~> 1.7'
+  spec.add_development_dependency 'rake', '~> 10.3'
   spec.add_development_dependency 'rspec', '~> 2.14.0'
   spec.add_development_dependency 'thor-scmversion', '< 1.6.0'
   spec.add_development_dependency 'geminabox', '~> 0.10'
-  spec.add_development_dependency 'webmock'
+  spec.add_development_dependency 'webmock', '~> 1.19'
 
   spec.required_ruby_version = '>= 1.9.3'
 end
