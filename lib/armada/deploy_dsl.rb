@@ -132,6 +132,10 @@ module Armada::DeployDSL
     set(:container_config, cfg)
   end
 
+  def privileged
+    set(:privileged, true)
+  end
+
   private
 
   def add_to_bindings(host_ip, container_port, port, type='tcp')
