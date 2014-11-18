@@ -1,5 +1,5 @@
 [![TravisCI](https://travis-ci.org/RallySoftware/armada.svg)](https://travis-ci.org/RallySoftware/armada)  
-[![Gem Version](https://badge.fury.io/rb/docker-armada.svg)](http://badge.fury.io/rb/docker-armada)
+[![Gem Version](https://badge.fury.io/rb/docker-armada.svg)](http://badge.fury.io/rb/docker-armada)  
 [![Stories in Ready](https://badge.waffle.io/RallySoftware/armada.svg?label=ready&title=Ready)](http://waffle.io/RallySoftware/armada)
 
 
