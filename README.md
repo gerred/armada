@@ -128,6 +128,13 @@ restart_policy { "Name" => "always" }
 restart_policy { "Name" => "on-failure", "MaximumRetryCount" => 5 }
 ```
 
+#### Privileged containers
+If you would like to have your container run in privileged mode just specify the following:
+
+```ruby
+privileged
+```
+
 #### Setting other descriptor values
 Some configuration options are not set using a DSL method. Instead you must call the `set` method. The current list of these options are:
 
@@ -151,7 +158,6 @@ If you want to use a docker feature not yet exposed through the armadafile, you 
 
 ```ruby
 container_config({ "Cmd" => [ "date" ] })
-container_config({"Privileged" => true})
 ```
 
 ## CLI

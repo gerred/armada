@@ -59,6 +59,7 @@ module Armada
       host_config['Binds'] = options[:binds] if options[:binds] && !options[:binds].empty?
       host_config['PortBindings'] = options[:port_bindings] if options[:port_bindings]
       host_config['PublishAllPorts'] = true
+      host_config['Privileged'] = options[:privileged] || false
       host_config
     end
 
