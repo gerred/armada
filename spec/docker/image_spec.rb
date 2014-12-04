@@ -34,8 +34,8 @@ describe Armada::Image do
         expect(Docker::Image).not_to receive(:create)
         armada_image.pull
 
-        expect(armada_image.id).to be(image_id)
-        expect(armada_image.image).to be(docker_image)
+        expect(armada_image.id).to eq("quay.io/someorg/someimage:latest")
+        expect(armada_image.image).to eq(docker_image)
       end
 
       it { expect { armada_image.pull }.to raise_error }
@@ -62,8 +62,8 @@ describe Armada::Image do
       let (:image) { Armada::Image.new(docker_host, my_options) }
 
       it "should use username and password from options" do
-        expect(image.auth[:username]).to be(my_options[:username])
-        expect(image.auth[:password]).to be(my_options[:password])
+        expect(image.auth[:username]).to eq(my_options[:username])
+        expect(image.auth[:password]).to eq(my_options[:password])
       end
     end
 
@@ -78,8 +78,8 @@ describe Armada::Image do
 
       it "should use username and password from dockercfg" do
         expect(image.auth).not_to be_nil
-        expect(image.auth[:username]).to be(credentials.username)
-        expect(image.auth[:password]).to be(credentials.password)
+        expect(image.auth[:username]).to eq(credentials.username)
+        expect(image.auth[:password]).to eq(credentials.password)
       end
     end
 
@@ -94,8 +94,8 @@ describe Armada::Image do
       let (:image) { Armada::Image.new(docker_host, my_options) }
 
       it "should use username and password from options" do
-        expect(image.auth[:username]).to be(my_options[:username])
-        expect(image.auth[:password]).to be(my_options[:password])
+        expect(image.auth[:username]).to eq(my_options[:username])
+        expect(image.auth[:password]).to eq(my_options[:password])
       end
     end
 

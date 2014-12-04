@@ -28,6 +28,7 @@ module Armada
         end
       else
         info "Not pulling image [#{@name}] with tag [#{@tag}] because `--no-pull` was specified."
+        @id = "#{@name}:#{@tag}"
         raise "The image id is not set, you cannot proceed with the deploy until a valid image is found -- [#{@name}:#{@tag}]" unless valid?
       end
     end
