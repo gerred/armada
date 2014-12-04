@@ -26,7 +26,6 @@ module Armada
       Armada.ui.info "#{Armada.executable_name} #{Armada::VERSION}"
     end
 
-
     desc "deploy SUBCOMMAND ...ARGS", "Deploy a docker container"
     subcommand "deploy", Armada::DeployCli
 
@@ -35,6 +34,15 @@ module Armada
 
     desc "clean SUBCOMMAND ...ARGS", "Clean a docker host(s)"
     subcommand "clean", Armada::CleanCli
+
+    desc "stop <project> <environment>", "Stop running containers for the project in the environment. Use --force to actually stop the containers"
+    option :hosts,            :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
+    option :ssh_gateway,      :type => :string,  :aliases => :G, :desc => "SSH Gateway Host"
+    option :ssh_gateway_user, :type => :string,  :aliases => :U, :desc => "SSH Gateway User"
+    option :force,            :type => :boolean, :aliases => :f, :desc => "Must specify the force option if you want the containers stopped", :default => false, :lazy_default => true
+    def stop(project, environment)
+      Armada::Commands.stop(project, environment, options)
+    end
 
   end
 end

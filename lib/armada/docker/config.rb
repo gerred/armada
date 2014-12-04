@@ -9,12 +9,13 @@ module Armada
       end
 
       def for_image(url)
-        @configs.each do |config|
-          # debate starts_with? vs ==
-          return config if url.start_with? config.url
+        @configs.each do |config|        
+          config_url = URI.parse(config.url).host || config.url
+          if url.start_with? config_url
+            return config
+          end
         end
-
-        return nil
+        nil
       end
 
       def self.load(path)
