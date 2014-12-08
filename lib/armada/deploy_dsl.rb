@@ -132,6 +132,10 @@ module Armada::DeployDSL
     set(:container_config, cfg)
   end
 
+  def start_config(cfg)
+    set(:start_config, cfg)
+  end
+
   def privileged
     set(:privileged, true)
   end

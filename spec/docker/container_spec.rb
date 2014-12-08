@@ -23,7 +23,9 @@ describe Armada::Container do
                         "2222/udp" => [{"HostIp" => "0.0.0.0", "HostPort" => "2222"}]},
     :env_vars      => { "KEY" => "VALUE" },
     :binds         => [ "/host/log:/container/log" ],
-    :restart_policy => { "MaximumRetryCount" => 5, "Name" => "always" }
+    :restart_policy => { "MaximumRetryCount" => 5, "Name" => "always" },
+    :container_config => { "CreateConfigKey" => "CreateConfigValue" },
+    :start_config => { "StartConfigKey" => "StartConfigValue" },
   }}
 
   describe "#stop" do
@@ -111,6 +113,7 @@ describe Armada::Container do
     it { should include("Volumes"      => { "/container/log" => {}}) }
     it { should include("VolumesFrom"  => "parent") }
     it { should include("RestartPolicy" => { "MaximumRetryCount" => 5, "Name" => "always" }) }
+    it { should include("CreateConfigKey" => "CreateConfigValue") }
   end
 
   describe ".create_host_config" do
@@ -119,6 +122,7 @@ describe Armada::Container do
     it { should include("PortBindings" => {"1111/tcp" => [{"HostIp" => "0.0.0.0", "HostPort" => "1111"}],
                                     "2222/udp" => [{"HostIp" => "0.0.0.0", "HostPort" => "2222"}]}) }
     it { should include("PublishAllPorts" => true) }
+    it { should include("StartConfigKey" => "StartConfigValue") }
   end
 
 end
