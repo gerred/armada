@@ -8,7 +8,7 @@
 Armada is a docker deployment tool which we originally forked from the [NewRelic Centurion](https://github.com/newrelic/centurion) project. It has since seen a huge refactor occur where we started using the [swipely/docker-api](https://github.com/swipely/docker-api) gem for interacting with our docker hosts instead of the mix of docker-cli and api calls that Centurion makes. The DSL is largely unchanged as it works really well for our intended purposes.
 
 ## Disclaimer
-This gem is used in production for deployments at Rally Software. We like the structure it gives us and the simplicity of the DSL. If you feel that we are missing something please open an issue and let's have a discussion about it. If you find a bug please submit an issue and if possible a reproducible test case. 
+This gem is used in production for deployments at Rally Software. We like the structure it gives us and the simplicity of the DSL. If you feel that we are missing something please open an issue and let's have a discussion about it. If you find a bug please submit an issue and if possible a reproducible test case.
 
 ## Installation
 
@@ -153,11 +153,17 @@ Armada can perform a http health check for your application. There are 4 pieces 
 
 **health_check_port will work even if you do not specify a contianer -> host port mapping. Armada will determine the dynamically assigned port to the expected container health check port and use that when performing the health check.**
 
-#### Raw Container Config
-If you want to use a docker feature not yet exposed through the armadafile, you can include a raw container config, and the rest of the armadafile will be applied on top of it.
+#### Raw Create Container Config
+If you want to use a create container docker feature not yet exposed through the armadafile, you can include a raw container config, and the rest of the armadafile will be applied on top of it.
 
 ```ruby
 container_config({ "Cmd" => [ "date" ] })
+```
+#### Raw Start Container Config
+If you want to use a start container docker feature not yet exposed through the armadafile, you can include a raw start container config, and the rest of the armadafile will be applied on top of it.
+
+```ruby
+start_config({ "VolumesFrom" => [ "other_container" ] })
 ```
 
 ## CLI
@@ -266,7 +272,7 @@ This will remove all images that are considered "orphaned". This means they are 
 ```bash
 bld-docker-01 -- unable to remove image 9d535e81db1e because of the following error - Expected([200, 201, 202, 203, 204, 304]) <=> Actual(409 Conflict)
 ```
-This is because it is not the parent image. We are working to resolve this problem. You may also have to run this command a few times to get all the images cleaned up. 
+This is because it is not the parent image. We are working to resolve this problem. You may also have to run this command a few times to get all the images cleaned up.
 
 Options:
 * `hosts` - The list of hosts you wish to perform this action against
