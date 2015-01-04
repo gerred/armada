@@ -159,12 +159,14 @@ If you want to use a create container docker feature not yet exposed through the
 ```ruby
 container_config({ "Cmd" => [ "date" ] })
 ```
-#### Raw Start Container Config
-If you want to use a start container docker feature not yet exposed through the armadafile, you can include a raw start container config, and the rest of the armadafile will be applied on top of it.
+#### Raw Host Container Config
+If you want to use a docker feature not yet exposed through the armadafile, you can include a raw host config, and the rest of the armadafile will be applied on top of it.
 
 ```ruby
-start_config({ "VolumesFrom" => [ "other_container" ] })
+host_config({ "VolumesFrom" => [ "other_container" ] })
 ```
+
+** Note - `start_config` has been deprecated use host_config **
 
 ## CLI
 The CLI is written using [Thor](http://whatisthor.com/). Below is current commands that can be executed using the Armada gem.
