@@ -55,6 +55,7 @@ module Armada::DeployDSL
   def set_current_environment(environment)
     env[:current_environment] = environment
     env[environment] ||= {}
+    env_vars ENVIRONMENT: environment.to_s.downcase
   end
 
   def current_environment
@@ -82,6 +83,10 @@ module Armada::DeployDSL
     current = fetch(:hosts, [])
     current << hostname
     set(:hosts, current)
+  end
+
+  def hostname(hostname)
+    set(:hostname, hostname)
   end
 
   def localhost

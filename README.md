@@ -110,6 +110,14 @@ Examples:
 host 'bld-docker-01:4243'
 ```
 
+#### hostname - Set the hostname for the container
+The `hostname` method takes 1 parameter which is a string container the hostname you wish to apply to the container being started. If you do not call `hostname` it will use the `host` value as the hostname.
+
+Examples
+```ruby
+hostname 'myhomename'
+```
+
 **You can call this method multiple times to specify multiple hosts**
 
 #### container_name - Override the container name
