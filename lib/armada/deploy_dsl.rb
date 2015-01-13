@@ -138,7 +138,12 @@ module Armada::DeployDSL
   end
 
   def start_config(cfg)
-    set(:start_config, cfg)
+    Armada.ui.warn "This option will be deprecated soon. Use host_config instead."
+    set(:host_config, cfg)
+  end
+
+  def host_config(cfg)
+    set(:host_config, cfg)
   end
 
   def privileged

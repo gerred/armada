@@ -55,7 +55,7 @@ module Armada
     end
 
     def self.create_host_config(options)
-      host_config = options[:start_config] || {}
+      host_config = options[:host_config] || {}
       host_config['Binds'] = options[:binds] if options[:binds] && !options[:binds].empty?
       host_config['PortBindings'] = options[:port_bindings] if options[:port_bindings]
       host_config['PublishAllPorts'] = true

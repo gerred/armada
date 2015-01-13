@@ -25,7 +25,7 @@ describe Armada::Container do
     :binds         => [ "/host/log:/container/log" ],
     :restart_policy => { "MaximumRetryCount" => 5, "Name" => "always" },
     :container_config => { "CreateConfigKey" => "CreateConfigValue" },
-    :start_config => { "StartConfigKey" => "StartConfigValue" },
+    :host_config => { "StartConfigKey" => "StartConfigValue" },
   }}
 
   describe "#stop" do
