@@ -109,7 +109,7 @@ describe Armada::Container do
     it { should include("Hostname"     => "hostname") }
     it { should include("name"         => "some_container") }
     it { should include("ExposedPorts" => { "1111/tcp" => {}, "2222/udp" => {}}) }
-    it { should include("Env"          => ["KEY=VALUE"]) }
+    it { should include("Env"          => ["KEY=VALUE", "HOST=hostname"]) }
     it { should include("Volumes"      => { "/container/log" => {}}) }
     it { should include("VolumesFrom"  => "parent") }
     it { should include("RestartPolicy" => { "MaximumRetryCount" => 5, "Name" => "always" }) }
