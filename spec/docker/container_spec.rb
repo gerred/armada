@@ -28,6 +28,16 @@ describe Armada::Container do
     :host_config => { "StartConfigKey" => "StartConfigValue" },
   }}
 
+  describe "#initialize" do
+    before { armada_container }
+
+    it "should have the log mount" do
+      expect(options[:binds]).not_to be_nil
+      expect(options[:binds].length).to equal 1
+      expect(options[:binds][0]).to match /^\/var\/log\/#{container_name}-\d+:\/var\/log\/service$/
+    end
+  end
+
   describe "#stop" do
     context "when the container exists" do
       before { docker_host.should_receive(:get_container).and_return(docker_container) }
@@ -110,7 +120,7 @@ describe Armada::Container do
     it { should include("name"         => "some_container") }
     it { should include("ExposedPorts" => { "1111/tcp" => {}, "2222/udp" => {}}) }
     it { should include("Env"          => ["KEY=VALUE", "HOST=hostname"]) }
-    it { should include("Volumes"      => { "/container/log" => {}}) }
+    it { should include("Volumes"      => { "/container/log" => {} }) }
     it { should include("VolumesFrom"  => "parent") }
     it { should include("RestartPolicy" => { "MaximumRetryCount" => 5, "Name" => "always" }) }
     it { should include("CreateConfigKey" => "CreateConfigValue") }

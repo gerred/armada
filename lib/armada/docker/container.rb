@@ -9,6 +9,10 @@ module Armada
       @name        = options[:container_name]
       @container   = docker_host.get_container(@name)
       @options     = options
+
+      now_in_ns = Integer(Time.now.to_f * 1000000.0)
+      @options[:binds] ||= []
+      @options[:binds] << "/var/log/#{@name}-#{now_in_ns}:/var/log/service"
     end
 
     def stop
