@@ -36,10 +36,11 @@ module Armada
     subcommand "clean", Armada::CleanCli
 
     desc "stop <project> <environment>", "Stop running containers for the project in the environment. Use --force to actually stop the containers"
+    option :force,            :type => :boolean, :aliases => :f, :desc => "Must specify the force option if you want the containers stopped", :default => false, :lazy_default => true
     option :hosts,            :type => :array,   :aliases => :h, :desc => "The docker host(s) to deploy to. This can be a comma sepearted list."
     option :ssh_gateway,      :type => :string,  :aliases => :G, :desc => "SSH Gateway Host"
     option :ssh_gateway_user, :type => :string,  :aliases => :U, :desc => "SSH Gateway User"
-    option :force,            :type => :boolean, :aliases => :f, :desc => "Must specify the force option if you want the containers stopped", :default => false, :lazy_default => true
+    option :volumes,          :type => :boolean, :aliases => :v, :desc => "Remove the volumes associated with the container", :default => false, :lazy_default => true
     def stop(project, environment)
       Armada::Commands.stop(project, environment, options)
     end
