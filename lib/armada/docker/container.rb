@@ -45,7 +45,7 @@ module Armada
     def kill
       return if @container.nil?
       info "Stopping old container #{@container.id[0..7]} (#{@name})"
-      @container.kill
+      @container.kill :v => @options[:volumes]
     end
 
     def remove
