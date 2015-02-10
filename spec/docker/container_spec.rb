@@ -34,7 +34,7 @@ describe Armada::Container do
     it "should have the log mount" do
       expect(options[:binds]).not_to be_nil
       expect(options[:binds].length).to equal 1
-      expect(options[:binds][0]).to match /^\/var\/log\/#{container_name}-\d+:\/var\/log\/service$/
+      expect(options[:binds][0]).to match /^\/var\/log\/containers\/#{container_name}\/.*:\/var\/log\/service$/
     end
   end
 
