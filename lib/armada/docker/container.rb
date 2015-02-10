@@ -12,7 +12,7 @@ module Armada
 
       now_in_ns = Integer(Time.now.to_f * 1000000.0)
       @options[:binds] ||= []
-      @options[:binds] << "/var/log/#{@name}-#{now_in_ns}:/var/log/service"
+      @options[:binds] << "/var/log/containers/#{@name}/#{SecureRandom.uuid}:/var/log/service"
     end
 
     def stop
