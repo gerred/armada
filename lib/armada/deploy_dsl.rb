@@ -55,7 +55,7 @@ module Armada::DeployDSL
   def set_current_environment(environment)
     env[:current_environment] = environment
     env[environment] ||= {}
-    env_vars ENVIRONMENT: environment.to_s.downcase
+    env_vars ENV: environment.to_s.downcase
   end
 
   def current_environment
