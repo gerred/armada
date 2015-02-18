@@ -295,6 +295,13 @@ Examples:
 armada clean images --hosts my-docker-host-01:3435
 ```
 
+## TLS Support
+If the DOCKER_CERT_PATH environment variable is set then the proper cert options will be set for the client.  Make sure you have the following files in the DOCKER_CERT_PATH location:
+* `cert.pem`
+* `key.pem`
+* `ca.pem`
+
+
 ## Maintainers
 [Jonathan Chauncey (jchauncey)](https://github.com/jchauncey)  
 [Darrell Hamilton (zeroem)](https://github.com/zeroem)
