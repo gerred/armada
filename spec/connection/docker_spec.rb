@@ -19,6 +19,9 @@ describe Armada::Connection::Docker do
     end
   end
 
+  context 'when docker tls verify is set' do
+  end
+
   context 'when certificate path is set' do
     before(:each) { ENV['DOCKER_CERT_PATH'] = '/some/cert/path' }
 
@@ -31,8 +34,24 @@ describe Armada::Connection::Docker do
     context 'connection options' do
       subject { connection.options }
 
-      it { should include(:client_cert, :client_key, :ssl_ca_file) }
-      it { should_not include(:ssl_verify_peer) }
+      it { should include(:client_cert, :client_key, :ssl_ca_file, :ssl_verify_peer) }
+      its([:ssl_verify_peer]) { should be_false }
+    end
+
+    context 'disable TLS verify' do
+      before(:each) { ENV['DOCKER_TLS_VERIFY'] = '0'}
+      subject { connection.options }
+
+      it { should include(:client_cert, :client_key, :ssl_ca_file, :ssl_verify_peer) }
+      its([:ssl_verify_peer]) { should be_false }
+    end
+
+    context 'enable TLS verify' do
+      before(:each) { ENV['DOCKER_TLS_VERIFY'] = '1'}
+      subject { connection.options }
+
+      it { should include(:client_cert, :client_key, :ssl_ca_file, :ssl_verify_peer) }
+      its([:ssl_verify_peer]) { should be_true }
     end
   end
 

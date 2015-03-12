@@ -24,12 +24,11 @@ module Armada
 
       def connection_opts
         opts = {}
-
         if cert_path = ENV['DOCKER_CERT_PATH']
           opts[:client_cert] = File.join(cert_path, 'cert.pem')
           opts[:client_key] = File.join(cert_path, 'key.pem')
           opts[:ssl_ca_file] = File.join(cert_path, 'ca.pem')
-          opts[:ssl_verify_peer] = false if @gateway
+          opts[:ssl_verify_peer] = @gateway ? false : ENV['DOCKER_TLS_VERIFY'] == '1'
         end
 
         opts
